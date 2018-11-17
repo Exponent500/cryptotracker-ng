@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 
 import { HomeComponent } from './core/home/home.component';
-import { CoinsComponent } from './coins/coins.component';
 
 const appRoutes: Routes = [
     { path: '', component: HomeComponent },
-    { path: 'coins', component: CoinsComponent }
+    { path: 'coins', loadChildren: './coins/coins.module#CoinsModule' }
 ];
 
 @NgModule({
