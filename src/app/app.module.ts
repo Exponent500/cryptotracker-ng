@@ -7,7 +7,8 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { CoreModule } from './core/core.module';
 import { CoinsService } from './coins/coins.service';
-import { CryptoCompareDataService } from './core/cryptocompare/cryptocompare-data.service';
+import { CryptoCompareDataService } from './shared/cryptocompare/cryptocompare-data.service';
+import { SharedModule } from './shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { CryptoCompareDataService } from './core/cryptocompare/cryptocompare-dat
     RouterModule,
     HttpClientModule,
     CoreModule,
-    AppRoutingModule
+    AppRoutingModule,
+    SharedModule
   ],
   providers: [CoinsService, CryptoCompareDataService],
   bootstrap: [AppComponent]

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { CryptoCompareDataService } from '../core/cryptocompare/cryptocompare-data.service';
-import { CoinData } from '../core/cryptocompare/interfaces';
+import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-data.service';
+import { CoinData } from '../shared/cryptocompare/interfaces';
 
 @Injectable()
 export class CoinsService {

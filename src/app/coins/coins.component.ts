@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { CoinsService } from './coins.service';
-import { CryptocompareSocketService } from '../core/cryptocompare/cryptocompare-socket.service';
-import { CoinData, RealTimeInfo } from '../core/cryptocompare/interfaces';
+import { CryptocompareSocketService } from '../shared/cryptocompare/cryptocompare-socket.service';
+import { CoinData, RealTimeInfo } from '../shared/cryptocompare/interfaces';
 
 import { Subscription } from 'rxjs';
 import { mergeMap, map } from 'rxjs/operators';

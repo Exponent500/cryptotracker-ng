@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 import { CoinsComponent } from './coins.component';
 import { CoinsRoutingModule } from './coins-routing.module';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
     declarations: [CoinsComponent],
     imports: [
         CoinsRoutingModule,
-        CommonModule
+        SharedModule
     ]
 })
 export class CoinsModule {}
