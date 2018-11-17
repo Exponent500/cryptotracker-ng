@@ -20,8 +20,10 @@
     "@angular/platform-browser": "^6.1.0",
     "@angular/platform-browser-dynamic": "^6.1.0",
     "@angular/router": "^6.1.0",
+    "@types/socket.io-client": "^1.4.32",
     "core-js": "^2.5.4",
     "rxjs": "~6.2.0",
+    "socket.io-client": "^2.1.1",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
@@ -32,6 +34,7 @@
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
+    "bootstrap": "^3.3.7",
     "codelyzer": "~4.3.0",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",

@@ -68,6 +68,10 @@ import 'core-js/es7/reflect';
  */
 // (window as any).__Zone_enable_cross_context_check = true;
 
+// unsure why adding this rectifies the "global is not defined" issue seen when trying to use socket.io...
+// see following stack overflow: https://stackoverflow.com/questions/50373966/global-is-not-defined-at-node-modules-socket-io-parser-is-buffer-js 
+(window as any).global = window;
+
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
