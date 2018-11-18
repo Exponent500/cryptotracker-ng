@@ -1,0 +1,11 @@
+@import 'variables';
+
+#main-container {
+    background-color: $light-grey-bgr;
+    padding-top: 50px;
+}
+
+.container {
+    background-color: $white-bgr;
+    min-height: 820px;
+}

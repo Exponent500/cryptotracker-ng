@@ -5,15 +5,18 @@ import { HeaderComponent } from './header/header.component';
 import { AppRoutingModule } from '../app-routing.module';
 import { CoinsService } from '../coins/coins.service';
 import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-data.service';
+import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
     declarations: [
         HomeComponent,
-        HeaderComponent
+        HeaderComponent,
+        FooterComponent
     ],
     imports: [AppRoutingModule],
     exports: [
         HeaderComponent,
+        FooterComponent,
         AppRoutingModule
     ],
     providers: [

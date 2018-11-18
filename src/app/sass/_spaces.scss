@@ -1,0 +1,87 @@
+// May want to add finer granuality spacings
+$spaces-sizes: (
+    xs:   $gutter / 5,     
+    sm:   $gutter / 2,
+    md:   $gutter,
+    lg:   $gutter * 1.5,
+    xlg:  $gutter * 2,
+    none: 0
+);
+
+@each $size-name, $size-value in $spaces-sizes
+{
+  .p-#{$size-name}
+  {
+    padding: $size-value;
+  }
+
+  .p-left-#{$size-name}
+  {
+    padding-left: $size-value;
+  }
+
+  .p-right-#{$size-name}
+  {
+    padding-right: $size-value;
+  }
+
+  .p-horizontal-#{$size-name}
+  {
+    @extend .p-left-#{$size-name};
+    @extend .p-right-#{$size-name};
+  }
+
+  .p-bottom-#{$size-name}
+  {
+    padding-bottom: $size-value;
+  }
+
+  .p-top-#{$size-name}
+  {
+    padding-top: $size-value;
+  }
+
+
+  .p-vertical-#{$size-name}
+  {
+    @extend .p-top-#{$size-name};
+    @extend .p-bottom-#{$size-name};
+  }
+
+  .m-#{$size-name}
+  {
+    margin: $size-value;
+  }
+
+  .m-left-#{$size-name}
+  {
+    margin-left: $size-value;
+  }
+
+  .m-right-#{$size-name}
+  {
+    margin-right: $size-value;
+  }
+
+  .m-horizontal-#{$size-name}
+  {
+    @extend .m-left-#{$size-name};
+    @extend .m-right-#{$size-name};
+  }
+
+  .m-bottom-#{$size-name}
+  {
+    margin-bottom: $size-value;
+  }
+
+  .m-top-#{$size-name}
+  {
+    margin-top: $size-value;
+  }
+
+  .m-vertical-#{$size-name}
+  {
+    @extend .m-top-#{$size-name};
+    @extend .m-bottom-#{$size-name};
+  }
+}

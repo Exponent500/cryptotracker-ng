@@ -1,0 +1,10 @@
+@import 'variables';
+
+.footer {
+    background-color: $black-bgr;
+    height: 100px;
+
+    .text {
+        color: gray;
+    }
+}

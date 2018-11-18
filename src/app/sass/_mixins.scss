@@ -1,0 +1,4 @@
+//debugging mixin; adds a randomly colored outline to whatever selector you invoke it on. Color changes each recompile.
+@mixin rand-outline($width: 1px, $style: solid) {
+    outline: #{$width} #{$style} random-color();
+}

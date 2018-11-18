@@ -1,0 +1,66 @@
+//// ---------- COLORS ---------- ////
+
+// background-colors
+$light-grey-bgr: #ECF1F5;
+$white-bgr: #FFF;
+$black-bgr: #000;
+
+// text-colors
+
+// border-colors
+
+// icon-colors
+
+// box-shadows
+
+//// ---------- Gradients ---------- ////
+
+//// ---------- Borders ---------- ////
+
+//// ---------- Sizes ---------- ////
+$gutter: 10px;
+
+//// ---------- FONTS ---------- ////
+
+// TBD font style
+$font-family: 'Lato', Helvetica, Arial sans-serif;
+
+// Font weights
+$font-weight-light: 200;
+$font-weight-normal: 400;
+$font-weight-bold: 700;
+$font-weight-heavy: 900;
+
+/// ---------- font sizes ------------- ///
+$base-font-size: 15px;
+$base-font-size-sm: 10px;
+
+$font-size: 1rem;
+$font-size-xxs: .6rem;
+$font-size-xs: .7rem;
+$font-size-sm: .87rem;
+$font-size-md-sm: .95rem;
+$font-size-md: 1.2rem;
+$font-size-lg: 1.3rem;
+$font-size-x-lg: 1.6rem;
+$font-size-xx-lg: 2rem;
+$font-size-xxx-lg: 2.7rem;
+$font-size-huge: 4.3rem;
+
+//// ---------- z-index layers ---------- ////
+$layer-minus3: -3;
+$layer-minus2: -2;
+$layer-minus1: -1;
+$default-render-layer: 0;
+$layer-1: 1;
+$layer-2: 2;
+$layer-3: 3;
+$layer-4: 4;
+
+/// --------- transition times ------------- ///
+$x-short-transition:.15s;
+$short-transition: .3s;
+$medium-transition: .5s;
+$long-transition: .8s;
+$x-long-transition: 1.2s;
+

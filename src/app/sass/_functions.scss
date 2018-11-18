@@ -1,0 +1,7 @@
+// debugging mixin; returns a random color from the $colors list.
+@function random-color() {
+  // This a random list of colors.
+  // scss-lint:disable ColorVariable
+  $colors: #F00, OrangeRed, #FFA500, PaleGreen, #FF0, Chartreuse, #00F, Aquamarine, #0F0, #0FF, Darkorange, Gold, GreenYellow, SlateBlue, DarkCyan, SeaGreen, DarkSeaGreen;
+  @return nth($colors, random(length($colors)));
+}
