@@ -4,14 +4,14 @@
       <th>#</th>
       <th colspan="2">Coin</th>
       <th class="price">Price</th>
-      <th>Vol 24h</th>
-      <th>Market Cap</th>
-      <th>% Change (24H)</th>
+      <th class="volume">Vol 24h</th>
+      <th class="marketcap">Market Cap</th>
+      <th class="percent-change24h">% Change (24H)</th>
     </tr>
   </thead>
   <tbody class="coin-table-body">
       <tr *ngFor="let data of coinsDataToDisplay; let i=index">
-          <td>{{i}}</td>
+          <td>{{i + 1}}</td>
           <td class="icon">
             <img [src]="'https://www.cryptocompare.com' + data.CoinInfo.ImageUrl">
           <td class="name">
@@ -19,10 +19,23 @@
             <br>
             <span>{{data.CoinInfo.Name}}</span>
           </td>
-          <td class="price">{{data.SocketData?.price | currency }}</td>
-          <td>{{data.SocketData?.volume | currency:'USD':'symbol':'1.0-0' }}</td>
-          <td>{{data.SocketData?.mcap | currency:'USD':'symbol':'1.0-0' }}</td>
-          <td>{{data.SocketData?.changePercent}}</td>
+          <td class="price">
+            <div class="price-value" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
+                {{data.SocketData?.price | currency:'USD':'symbol':'1.0-6' }}
+            </div>
+          </td>
+          <td class="volume">
+            {{data.SocketData?.volume | currency:'USD':'symbol':'1.0-0' }}
+          </td>
+          <td class="marketcap" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
+            {{data.SocketData?.mcap | currency:'USD':'symbol':'1.0-0' }}
+          </td>
+          <td class="percent-change24h">
+            <div class="percent-change24h-value"
+                [ngClass]="{'positive': data.SocketData?.changePercent > '0', 'negative': data.SocketData?.changePercent < '0' }">
+                {{data.SocketData?.changePercent}}
+            </div>
+          </td>
         </tr> 
   </tbody>
 </table>

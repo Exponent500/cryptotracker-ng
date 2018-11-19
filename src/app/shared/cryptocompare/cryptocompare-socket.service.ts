@@ -5,65 +5,66 @@ import { CCCSocketDataModified } from './interfaces';
 
 export class CryptocompareSocketService {
     private socket: SocketIOClient.Socket;
-    private subscriptions: string [] = [];
-    private currentPrice = {};
+    private socketSubscriptions: string [] = [];
 
     constructor() {
         this.socket = io('https://streamer.cryptocompare.com/');
     }
 
     /**
-     * Add a list of subscriptions to listen to.
+     * Add socket subscriptions of interest.
      */
     addSubscriptions(subscriptions: string[]) {
-        this.subscriptions = subscriptions;
+        this.socketSubscriptions = subscriptions;
         this.socket.emit('SubAdd', { subs: subscriptions });
     }
 
     /**
-     * Creates an observable that emits the socketData you've subscribed to.
+     * Emits socket messages pertaining to the socket subscriptions that the user is currently subscribed to.
      */
     onNewMessage(): Observable<CCCSocketDataModified> {
         return Observable.create(observer => {
-            this.socket.on('m', message => {
+            this.socket.on('m', (message: string) => {
                 observer.next(this.unPackData(message));
             });
         });
     }
 
     /**
-     * Converts Raw socket data to a shape more amenable for being displayed on the template.
+     * Unsubscribes from all socket subscriptions that are currently being subscribed to.
      */
-    unPackData(message: string): CCCSocketDataModified {
-        const unPackedData = CCC.CURRENT.unpack(message);
-        const from = unPackedData['FROMSYMBOL'];
-        const to = unPackedData['TOSYMBOL'];
-        const tsym = CCC.STATIC.CURRENCY.getSymbol(to);
-        const pair = from + to;
-
-        if (!this.currentPrice.hasOwnProperty(pair)) {
-            this.currentPrice[pair] = {};
-        }
-
-        for (const key in unPackedData) {
-            this.currentPrice[pair][key] = unPackedData[key];
-        }
-
-        if (this.currentPrice[pair]['LASTTRADEID']) {
-            this.currentPrice[pair]['LASTTRADEID'] = parseInt(this.currentPrice[pair]['LASTTRADEID']).toFixed(0);
-        }
-        this.currentPrice[pair]['CHANGE24HOUR'] =
-            CCC.convertValueToDisplay(tsym, (this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']));
-        this.currentPrice[pair]['CHANGE24HOURPCT'] =
-            ((this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']) /
-            this.currentPrice[pair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
-        return this.currentPrice;
+    unSubscribe() {
+        this.socket.emit('SubRemove', { subs: this.socketSubscriptions });
     }
 
     /**
-     * Unsubscribes from all events you are currently listening to.
+     * Converts Raw socket data to a shape more amenable for being displayed on the template.
      */
-    unSubscribe() {
-        this.socket.emit('SubRemove', { subs: this.subscriptions });
+    private unPackData(message: string): CCCSocketDataModified {
+        console.log(message);
+        const currentPrice = {};
+        const unPackedData = CCC.CURRENT.unpack(message);
+        const from: string = unPackedData['FROMSYMBOL'];
+        const to: string = unPackedData['TOSYMBOL'];
+        const tsym: string = CCC.STATIC.CURRENCY.getSymbol(to);
+        const pair = from + to;
+
+        if (!currentPrice.hasOwnProperty(pair)) {
+            currentPrice[pair] = {};
+        }
+
+        for (const key in unPackedData) {
+            currentPrice[pair][key] = unPackedData[key];
+        }
+
+        if (currentPrice[pair]['LASTTRADEID']) {
+            currentPrice[pair]['LASTTRADEID'] = parseInt(currentPrice[pair]['LASTTRADEID']).toFixed(0);
+        }
+        currentPrice[pair]['CHANGE24HOUR'] =
+            CCC.convertValueToDisplay(tsym, (currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']));
+        currentPrice[pair]['CHANGE24HOURPCT'] =
+            ((currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']) /
+            currentPrice[pair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
+        return currentPrice;
     }
 }

@@ -34,6 +34,7 @@ export interface SocketData {
     volume: number;
     mcap: number;
     changePercent: string;
+    flags: string;
 }
 
 export interface CoinData {

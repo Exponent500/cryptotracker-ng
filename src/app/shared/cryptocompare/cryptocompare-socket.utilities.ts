@@ -1,11 +1,13 @@
 /**
- * These utilities are taken directly from https://github.com/cryptoqween/cryptoqween.github.io with minor mods
+ * These utilities are taken directly from https://github.com/cryptoqween/cryptoqween.github.io with minor mods.
+ * Further docs for interacting with the cryptocompare websocket are found here: https://www.cryptocompare.com/api/#-api-web-socket-
  */
 
 export const CCC: any = {};
 CCC.STATIC = CCC.STATIC || {};
-CCC.STATIC.CURRENCY = CCC.STATIC.CURRENCY || {};
 
+CCC.STATIC.CURRENCY = CCC.STATIC.CURRENCY || {};
+// A dictionary of currency symbols used for various currencies.
 CCC.STATIC.CURRENCY.SYMBOL = {
     'BTC': 'Ƀ',
     'LTC': 'Ł',
@@ -23,11 +25,56 @@ CCC.STATIC.CURRENCY.SYMBOL = {
     'BRL': 'R$'
 };
 
-CCC.STATIC.CURRENCY.getSymbol = symbol => {
-    return CCC.STATIC.CURRENCY.SYMBOL[symbol] || symbol;
+// Returns the currency symbol associated with a specific currency ticker name.
+// For example, if provided the ticker 'USD', it will return the symbol '$'.
+// If no symbol is found, then the ticker provided will be returned.
+// For example, if provided the ticker 'US', it would return 'US', as 'US' not a valid ticker.
+CCC.STATIC.CURRENCY.getSymbol = (ticker: string): string => {
+    return CCC.STATIC.CURRENCY.SYMBOL[ticker] || ticker;
 };
 
+// There are 3 types of socket subscriptions available: TRADE, CURRENT, and CURRENTAGG.
+// Cryptocompare provides utilities for the TRADE and CURRENT subscriptions.
+// The utilities for the CURRENT subscription suffice for the CURRENTAGG subscription,
+// so there is no utility names specific to the CURRENTAGG subscription.
+CCC.TRADE = CCC.TRADE || {};
 CCC.CURRENT = CCC.CURRENT || {};
+
+
+// A dictionary of FLAG values emitted from the CURRENT and CURRENTAGG socket data subscriptions.
+// The keys describe what changed between the last and current emissions of CURRENT and CURRENTAGG subscriptions.
+// The values represents the FLAG value sent by the CURRENT and CURRENTAGG subscriptions.
+// The CURRENT subscription has output data in the following format:
+// '{Type}~{ExchangeName}~{FromCurrency}~{ToCurrency}~{Flag}~{Price}~{LastUpdate}~{LastVolume}~{LastVolumeTo}~{LastTradeId}~{Volume24h}~{Volume24hTo}~{MaskInt}'
+// The CURRENTAGG subscription has output data in the following format:
+// '{SubscriptionId}~{ExchangeName}~{FromCurrency}~{ToCurrency}~{Flag}~{Price}~{LastUpdate}~{LastVolume}~{LastVolumeTo}~{LastTradeId}~{Volume24h}~{Volume24hTo}~{LastMarket}'
+// As you can see from both formats, there are various ~ separated fields. The value of the Flag field is what is of interest here.
+// So for example, if the Flag field is 0x1, then we know that the Price has gone up since the last emission.
+
+CCC.CURRENT.FLAGS = {
+  'PRICEUP': 0x1, // hex for binary 1
+  'PRICEDOWN': 0x2, // hex for binary 10
+  'PRICEUNCHANGED': 0x4, // hex for binary 100
+  'BIDUP': 0x8, // hex for binary 1000
+  'BIDDOWN': 0x10, // hex for binary 10000
+  'BIDUNCHANGED': 0x20, // hex for binary 100000
+  'OFFERUP': 0x40, // hex for binary 1000000
+  'OFFERDOWN': 0x80, // hex for binary 10000000
+  'OFFERUNCHANGED': 0x100, // hex for binary 100000000
+  'AVGUP': 0x200, // hex for binary 1000000000
+  'AVGDOWN': 0x400, // hex for binary 10000000000
+  'AVGUNCHANGED': 0x800, // hex for binary 100000000000
+};
+
+// A dictionary of ~ separated fields that are emitted by the CURRENT and CURRENTAGG subscriptions.
+// The keys describe the field, and the values represent the location of said field within the long string
+// of ~ separated fields that is emitted by the CURRENT and CURRENTAGG subscriptions.
+// The CURRENT subscription has output data in the following format:
+// '{Type}~{ExchangeName}~{FromCurrency}~{ToCurrency}~{Flag}~{Price}~{LastUpdate}~{LastVolume}~{LastVolumeTo}~{LastTradeId}~{Volume24h}~{Volume24hTo}~{MaskInt}'
+// The CURRENTAGG subscription has output data in the following format:
+// '{SubscriptionId}~{ExchangeName}~{FromCurrency}~{ToCurrency}~{Flag}~{Price}~{LastUpdate}~{LastVolume}~{LastVolumeTo}~{LastTradeId}~{Volume24h}~{Volume24hTo}~{LastMarket}'
+// Here you can think of Type, ExchangeName, etc as Fields.
+
 CCC.CURRENT.FIELDS = {
     'TYPE': 0x0, // hex for binary 0, it is a special case of fields that are always there
     'MARKET': 0x0, // hex for binary 0, it is a special case of fields that are always there
@@ -55,7 +102,9 @@ CCC.CURRENT.FIELDS = {
     'LASTMARKET': 0x40000 // hex for binary 1000000000000000000, this is a special case and will only appear on CCCAGG messages
 };
 
-CCC.CURRENT.unpack = value => {
+// Takes CURRENT or CURRENTAGG subscription data and converts it to a dictionary who's keys represent descriptions of the data,
+// and who's values represent the data itself.
+CCC.CURRENT.unpack = (value: string) => {
     const valuesArray = value.split('~');
     const valuesArrayLenght = valuesArray.length;
     const mask = valuesArray[valuesArrayLenght - 1];
@@ -166,7 +215,6 @@ CCC.convertValueToDisplay = (symbol, value, type, fullNumbers) => {
       if (valueAbs >= 1) {
         return prefix + CCC.filterNumberFunctionPolyfill(valueSign * valueAbs, decimalsOnNormalNumbers);
       }
-  
       return prefix + CCC.noExponents((valueSign * valueAbs).toPrecision(decimalsOnSmallNumbers));
     }
   };

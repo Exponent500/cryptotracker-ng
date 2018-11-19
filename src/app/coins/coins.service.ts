@@ -71,7 +71,8 @@ export class CoinsService {
                     price: socketData[key].PRICE,
                     volume: socketData[key].VOLUME24HOURTO,
                     mcap: socketData[key].PRICE * coinData[index].ConversionInfo.Supply,
-                    changePercent: socketData[key].CHANGE24HOURPCT
+                    changePercent: socketData[key].CHANGE24HOURPCT,
+                    flags: socketData[key].FLAGS
             };
             coinData[index].SocketData = socketDatum;
             this.coinsDataToDisplay = coinData;

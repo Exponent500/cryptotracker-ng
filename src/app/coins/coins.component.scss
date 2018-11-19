@@ -3,8 +3,24 @@
 .coin-table {
     th {
         background-color: $table-header-bgr;
+
         &.price {
             text-align: center;
+            width: 160px;
+        }
+
+        &.percent-change24h {
+            width: 130px;
+            text-align: right;
+        }
+
+        &.volume {
+            text-align: right;
+        }
+
+        &.marketcap {
+            text-align: right;
+            width: 200px;
         }
     }
     .coin-table-body {
@@ -15,12 +31,66 @@
                 width: 30px;
                 border-right: 0;
             }
+
             &.name {
                 border-left: 0;
             }
+
             &.price {
                 text-align: center;
+
+                .price-value {
+                    background-color: $price-chg-bgr;
+                    border-radius: 3px;
+                }
+
+                .price-value.increase {
+                    background-color: $price-chg-pos-bgr;
+                    color: white;
+                    font-weight: bold;
+                }
+
+                .price-value.decrease {
+                    background-color: $price-chg-neg-bgr;
+                    color: white;
+                    font-weight: bold;
+                }
             }
+
+            &.marketcap {
+                text-align: right;
+
+                &.increase {
+                    color: green;
+                    font-weight: bold;
+                }
+
+                &.decrease {
+                    color: red;
+                    font-weight: bold;
+                }
+            }
+
+            &.percent-change24h {
+                .percent-change24h-value {
+                    text-align: center;
+                    background-color: $percent-chg-24h-bgr;
+                    border-radius: 3px;
+
+                    &.postive {
+                        color: $percent-chg-24h-pos-bgr;
+                    }
+
+                    &.negative {
+                        color: $percent-chg-24h-neg-bgr;
+                    }
+                }
+            }
+
+            &.volume {
+                text-align: right;
+            }
+            
             img {
                 width: 25px;
             }
