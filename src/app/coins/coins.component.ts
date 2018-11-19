@@ -24,6 +24,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
   getCoinData() {
     this.getCoinDataSub = this.coinsService.getCoinData()
       .subscribe(coinData => this.coinsDataToDisplay = coinData);
+    this.subscriptions.push(this.getCoinDataSub);
   }
 
   ngOnDestroy() {
