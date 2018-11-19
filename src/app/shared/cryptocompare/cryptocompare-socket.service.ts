@@ -1,7 +1,7 @@
 import * as io from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { CCC } from './cryptocompare-socket.utilities';
-import { CCCRealTimeDataModified } from './interfaces';
+import { CCCSocketDataModified } from './interfaces';
 
 export class CryptocompareSocketService {
     private socket: SocketIOClient.Socket;
@@ -21,9 +21,9 @@ export class CryptocompareSocketService {
     }
 
     /**
-     * Creates an observable that emits the events that you are subscribed to.
+     * Creates an observable that emits the socketData you've subscribed to.
      */
-    onNewMessage(): Observable<CCCRealTimeDataModified> {
+    onNewMessage(): Observable<CCCSocketDataModified> {
         return Observable.create(observer => {
             this.socket.on('m', message => {
                 observer.next(this.unPackData(message));
@@ -34,7 +34,7 @@ export class CryptocompareSocketService {
     /**
      * Converts Raw socket data to a shape more amenable for being displayed on the template.
      */
-    unPackData(message: string): CCCRealTimeDataModified {
+    unPackData(message: string): CCCSocketDataModified {
         const unPackedData = CCC.CURRENT.unpack(message);
         const from = unPackedData['FROMSYMBOL'];
         const to = unPackedData['TOSYMBOL'];

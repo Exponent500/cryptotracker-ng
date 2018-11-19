@@ -6,6 +6,7 @@ import { AppRoutingModule } from '../app-routing.module';
 import { CoinsService } from '../coins/coins.service';
 import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-data.service';
 import { FooterComponent } from './footer/footer.component';
+import { CryptocompareSocketService } from '../shared/cryptocompare/cryptocompare-socket.service';
 
 @NgModule({
     declarations: [
@@ -21,7 +22,8 @@ import { FooterComponent } from './footer/footer.component';
     ],
     providers: [
         CoinsService,
-        CryptoCompareDataService
+        CryptoCompareDataService,
+        CryptocompareSocketService
     ]
 })
 export class CoreModule {}

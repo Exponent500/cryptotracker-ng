@@ -19,10 +19,10 @@
             <br>
             <span>{{data.CoinInfo.Name}}</span>
           </td>
-          <td class="price">{{data.RealTimeInfo?.price | currency }}</td>
-          <td>{{data.RealTimeInfo?.volume | currency:'USD':'symbol':'1.0-0' }}</td>
-          <td>{{data.RealTimeInfo?.mcap | currency:'USD':'symbol':'1.0-0' }}</td>
-          <td>{{data.RealTimeInfo?.changePercent}}</td>
+          <td class="price">{{data.SocketData?.price | currency }}</td>
+          <td>{{data.SocketData?.volume | currency:'USD':'symbol':'1.0-0' }}</td>
+          <td>{{data.SocketData?.mcap | currency:'USD':'symbol':'1.0-0' }}</td>
+          <td>{{data.SocketData?.changePercent}}</td>
         </tr> 
   </tbody>
 </table>

@@ -29,7 +29,7 @@ interface ConversionInfo {
     TotalVolume24H: number;
 }
 
-export interface RealTimeInfo {
+export interface SocketData {
     price: number;
     volume: number;
     mcap: number;
@@ -39,7 +39,7 @@ export interface RealTimeInfo {
 export interface CoinData {
     CoinInfo: CoinInfo;
     ConversionInfo: ConversionInfo;
-    RealTimeInfo?: RealTimeInfo;
+    SocketData?: SocketData;
 }
 
 interface SponsoredData {
@@ -139,7 +139,7 @@ export interface FullCoinTradingDataResponse {
     DISPLAY: FromCurrencyDISPLAY;
 }
 
-interface CCCRealTimeDatumModified {
+interface CCCSocketDatumModified {
     CHANGE24HOUR: string;
     CHANGE24HOURPCT: string;
     FLAGS: string;
@@ -164,6 +164,6 @@ interface CCCRealTimeDatumModified {
     VOLUMEHOURTO: number;
 }
 
-export interface CCCRealTimeDataModified {
-    [key: string]: CCCRealTimeDatumModified;
+export interface CCCSocketDataModified {
+    [key: string]: CCCSocketDatumModified;
 }
