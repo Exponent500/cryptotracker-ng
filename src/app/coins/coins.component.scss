@@ -1,0 +1,30 @@
+@import 'variables';
+
+.coin-table {
+    th {
+        background-color: $table-header-bgr;
+        &.price {
+            text-align: center;
+        }
+    }
+    .coin-table-body {
+        td {
+            vertical-align: middle;
+
+            &.icon {
+                width: 30px;
+                border-right: 0;
+            }
+            &.name {
+                border-left: 0;
+            }
+            &.price {
+                text-align: center;
+            }
+            img {
+                width: 25px;
+            }
+
+        }
+    }
+}

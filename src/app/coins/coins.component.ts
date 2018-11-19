@@ -10,7 +10,7 @@ import { mergeMap, map } from 'rxjs/operators';
 @Component({
   selector: 'app-coins',
   templateUrl: './coins.component.html',
-  styleUrls: ['./coins.component.css'],
+  styleUrls: ['./coins.component.scss'],
   providers: [CryptocompareSocketService]
 })
 export class CoinsComponent implements OnInit, OnDestroy {
@@ -44,12 +44,13 @@ export class CoinsComponent implements OnInit, OnDestroy {
                   if (index !== -1) {
                     const realTimeInfo: RealTimeInfo = {
                       price: realTimeData[key].PRICE,
-                      volume: realTimeData[key].VOLUME24HOUR,
+                      volume: realTimeData[key].VOLUME24HOURTO,
                       mcap: realTimeData[key].PRICE * coinsDataToDisplay[index].ConversionInfo.Supply,
                       changePercent: realTimeData[key].CHANGE24HOURPCT
                     };
                     coinsDataToDisplay[index].RealTimeInfo = realTimeInfo;
                     this.coinsDataToDisplay = coinsDataToDisplay;
+                    console.log(this.coinsDataToDisplay);
                   }
                 });
               })
