@@ -1,7 +1,7 @@
 <table class="coin-table table table-bordered table-hover">
   <thead>
     <tr>
-      <th>#</th>
+      <th class="row-number">#</th>
       <th colspan="2">Coin</th>
       <th class="price">Price</th>
       <th class="volume">Vol 24h</th>
@@ -11,7 +11,7 @@
   </thead>
   <tbody class="coin-table-body">
       <tr *ngFor="let data of coinsDataToDisplay; let i=index">
-          <td>{{i + 1}}</td>
+          <td class="row-number">{{i + 1}}</td>
           <td class="icon">
             <img [src]="'https://www.cryptocompare.com' + data.CoinInfo.ImageUrl">
           <td class="name">
@@ -25,10 +25,10 @@
             </div>
           </td>
           <td class="volume">
-            {{data.SocketData?.volume | currency:'USD':'symbol':'1.0-0' }}
+            {{data.SocketData?.volume}}
           </td>
           <td class="marketcap" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
-            {{data.SocketData?.mcap | currency:'USD':'symbol':'1.0-0' }}
+            {{data.SocketData?.mcap}}
           </td>
           <td class="percent-change24h">
             <div class="percent-change24h-value"

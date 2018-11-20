@@ -4,6 +4,10 @@
     th {
         background-color: $table-header-bgr;
 
+        &.row-number {
+            width: 40px;
+        }
+
         &.price {
             text-align: center;
             width: 160px;
@@ -16,16 +20,21 @@
 
         &.volume {
             text-align: right;
+            width: 120px;
         }
 
         &.marketcap {
             text-align: right;
-            width: 200px;
+            width: 120px;
         }
     }
     .coin-table-body {
         td {
             vertical-align: middle;
+
+            &.row-number {
+                text-align: right;
+            }
 
             &.icon {
                 width: 30px;

@@ -195,15 +195,15 @@ CCC.convertValueToDisplay = (symbol, value, type, fullNumbers) => {
     }
   
     if (type === 'short') {
-      if (valueAbs > 10000000000) {
+      if (valueAbs > 1000000000) {
         valueAbs = valueAbs / 1000000000;
         return prefix + CCC.filterNumberFunctionPolyfill(valueSign * valueAbs, decimalsOnBigNumbers) + ' B';
       }
-      if (valueAbs > 10000000) {
+      if (valueAbs > 1000000) {
         valueAbs = valueAbs / 1000000;
         return prefix + CCC.filterNumberFunctionPolyfill(valueSign * valueAbs, decimalsOnBigNumbers) + ' M';
       }
-      if (valueAbs > 10000) {
+      if (valueAbs > 1000) {
         valueAbs = valueAbs / 1000;
         return prefix + CCC.filterNumberFunctionPolyfill(valueSign * valueAbs, decimalsOnBigNumbers) + ' K';
       }

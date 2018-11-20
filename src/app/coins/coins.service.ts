@@ -4,6 +4,7 @@ import { map, mergeMap } from 'rxjs/operators';
 import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-data.service';
 import { CoinData, SocketData, CCCSocketDataModified, TopCoinsByTotalVolumeResponse } from '../shared/cryptocompare/interfaces';
 import { CryptocompareSocketService } from '../shared/cryptocompare/cryptocompare-socket.service';
+import { CCC } from '../shared/cryptocompare/cryptocompare-socket.utilities';
 
 @Injectable()
 export class CoinsService {
@@ -63,14 +64,16 @@ export class CoinsService {
         console.log(socketData);
         const keys = Object.keys(socketData);
         keys.forEach( key => {
+            const tsym = CCC.STATIC.CURRENCY.getSymbol(socketData[key].TOSYMBOL);
+            const price = socketData[key].PRICE;
             const index = coinData.findIndex( datum => {
                 return (key === (datum.ConversionInfo.CurrencyFrom + datum.ConversionInfo.CurrencyTo));
             });
             if (index !== -1) {
                 const socketDatum: SocketData = {
-                    price: socketData[key].PRICE,
-                    volume: socketData[key].VOLUME24HOURTO,
-                    mcap: socketData[key].PRICE * coinData[index].ConversionInfo.Supply,
+                    price: price,
+                    volume: CCC.convertValueToDisplay(tsym, socketData[key].VOLUME24HOURTO, 'short'),
+                    mcap: CCC.convertValueToDisplay(tsym, price * coinData[index].ConversionInfo.Supply, 'short'),
                     changePercent: socketData[key].CHANGE24HOURPCT,
                     flags: socketData[key].FLAGS
             };
