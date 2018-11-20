@@ -145,6 +145,8 @@ interface CCCSocketDatumModified {
     CHANGE24HOURPCT: string;
     FLAGS: string;
     FROMSYMBOL: string;
+    FULLVOLUMEFROM: number;
+    FULLVOLUMETO: number;
     HIGH24HOUR: number;
     LASTMARKET: string;
     LASTTRADEID: string;

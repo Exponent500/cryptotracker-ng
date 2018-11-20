@@ -6,6 +6,25 @@
 export const CCC: any = {};
 CCC.STATIC = CCC.STATIC || {};
 
+CCC.STATIC.TYPE = {
+  'TRADE': '0',
+  'FEEDNEWS': '1',
+  'CURRENT': '2',
+  'LOADCOMPLATE': '3',
+  'COINPAIRS': '4',
+  'CURRENTAGG': '5',
+  'TOPLIST': '6',
+  'TOPLISTCHANGE': '7',
+  'ORDERBOOK': '8',
+  'FULLORDERBOOK': '9',
+  'ACTIVATION': '10',
+  'FULLVOLUME': '11',
+  'TRADECATCHUP': '100',
+  'NEWSCATCHUP': '101',
+  'TRADECATCHUPCOMPLETE': '300',
+  'NEWSCATCHUPCOMPLETE': '301'
+};
+
 CCC.STATIC.CURRENCY = CCC.STATIC.CURRENCY || {};
 // A dictionary of currency symbols used for various currencies.
 CCC.STATIC.CURRENCY.SYMBOL = {
@@ -128,6 +147,29 @@ CCC.CURRENT.unpack = (value: string) => {
     }
     return unpackedCurrent;
 };
+
+CCC.FULLVOLUME = CCC.FULLVOLUME || {};
+
+CCC.FULLVOLUME.FIELDS = {
+  'TYPE': 0x0,
+  'SYMBOL': 0x0,
+  'FULLVOLUME': 0x0
+};
+
+CCC.FULLVOLUME.unpack = (volStr: string) => {
+    const valuesArray = volStr.split('~');
+    const unpackedCurrent = {};
+    let currentField = 0;
+    const fields = CCC.FULLVOLUME.FIELDS;
+    for (const property in fields) {
+      if (fields[property] === 0) {
+        unpackedCurrent[property] = valuesArray[currentField];
+        currentField++;
+      }
+    }
+    return unpackedCurrent;
+};
+
 
 CCC.noExponents = function(value) {
     const data = String(value).split(/[eE]/);

@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
+
 import { Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
+
 import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-data.service';
 import { CoinData, SocketData, CCCSocketDataModified, TopCoinsByTotalVolumeResponse } from '../shared/cryptocompare/interfaces';
 import { CryptocompareSocketService } from '../shared/cryptocompare/cryptocompare-socket.service';
@@ -20,7 +22,11 @@ export class CoinsService {
             .pipe(
                 mergeMap( response => {
                     const topCoinsByTotalVolumeData = response.Data;
-                    const cryptocompareSubscriptionsToAdd = topCoinsByTotalVolumeData.map( item => item.ConversionInfo.SubsNeeded[0]);
+                    const cryptocompareSubscriptionsToAdd = [];
+                    topCoinsByTotalVolumeData.forEach( item => {
+                        cryptocompareSubscriptionsToAdd.push(item.ConversionInfo.SubsNeeded[0]);
+                        cryptocompareSubscriptionsToAdd.push(`11~${item.ConversionInfo.CurrencyFrom}`);
+                    });
                     this.addSocketSubscriptions(cryptocompareSubscriptionsToAdd);
                     return this.subscribeToSocket()
                         .pipe(
@@ -72,7 +78,9 @@ export class CoinsService {
             if (index !== -1) {
                 const socketDatum: SocketData = {
                     price: price,
-                    volume: socketData[key].VOLUME24HOURTO,
+                    volume: socketData[key].FULLVOLUMETO ?
+                            socketData[key].FULLVOLUMETO :
+                            CCC.convertValueToDisplay(tsym, socketData[key].FULLVOLUMEFROM * price, 'short'),
                     mcap: CCC.convertValueToDisplay(tsym, price * coinData[index].ConversionInfo.Supply, 'short'),
                     changePercent: socketData[key].CHANGE24HOURPCT,
                     flags: socketData[key].FLAGS

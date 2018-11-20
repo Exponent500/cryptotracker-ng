@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
+import { Subscription } from 'rxjs';
+
 import { CoinsService } from './coins.service';
 import { CoinData } from '../shared/cryptocompare/interfaces';
-
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-coins',
@@ -15,7 +15,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
   getCoinDataSub: Subscription = new Subscription();
   coinsDataToDisplay: CoinData[] = [];
   currencyTicker = 'USD';
-  numberOfCoinsToDisplay = 100;
+  numberOfCoinsToDisplay = 10;
 
   constructor(private coinsService: CoinsService) { }
 

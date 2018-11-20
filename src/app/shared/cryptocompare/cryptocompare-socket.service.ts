@@ -1,11 +1,13 @@
 import * as io from 'socket.io-client';
 import { Observable } from 'rxjs';
+
 import { CCC } from './cryptocompare-socket.utilities';
 import { CCCSocketDataModified } from './interfaces';
 
 export class CryptocompareSocketService {
     private socket: SocketIOClient.Socket;
     private socketSubscriptions: string [] = [];
+    private currentPrice = {};
 
     constructor() {
         this.socket = io('https://streamer.cryptocompare.com/');
@@ -16,6 +18,7 @@ export class CryptocompareSocketService {
      */
     addSubscriptions(subscriptions: string[]) {
         this.socketSubscriptions = subscriptions;
+        console.log(subscriptions);
         this.socket.emit('SubAdd', { subs: subscriptions });
     }
 
@@ -25,7 +28,13 @@ export class CryptocompareSocketService {
     onNewMessage(): Observable<CCCSocketDataModified> {
         return Observable.create(observer => {
             this.socket.on('m', (message: string) => {
-                observer.next(this.unPackData(message));
+                const messageType = message.substring(0, message.indexOf('~'));
+
+                if (messageType === CCC.STATIC.TYPE.CURRENTAGG) {
+                    observer.next(this.mapCURRENTAGGToCCCSocketModified(message));
+                } else if (messageType === CCC.STATIC.TYPE.FULLVOLUME) {
+                    this.addFullVolumeDataToCurrentPriceData(message);
+                }
             });
         });
     }
@@ -37,37 +46,56 @@ export class CryptocompareSocketService {
         this.socket.emit('SubRemove', { subs: this.socketSubscriptions });
     }
 
-    /**
-     * Converts Raw socket data to a shape more amenable for being displayed on the template.
-     */
-    private unPackData(message: string): CCCSocketDataModified {
+
+    private addFullVolumeDataToCurrentPriceData = (message: string) => {
         console.log(message);
-        const currentPrice = {};
+        const volData = CCC.FULLVOLUME.unpack(message);
+        console.log(volData);
+        const from = volData['SYMBOL'];
+        const to = 'USD';
+        const tsym = CCC.STATIC.CURRENCY.getSymbol(to);
+        const pair = from + to;
+
+        if (!this.currentPrice.hasOwnProperty(pair)) {
+            this.currentPrice[pair] = {};
+        }
+
+        this.currentPrice[pair]['FULLVOLUMEFROM'] = parseFloat(volData['FULLVOLUME']);
+        if (this.currentPrice[pair]['PRICE']) {
+            const fullVolumeTo = ( (this.currentPrice[pair]['FULLVOLUMEFROM'] - this.currentPrice[pair]['VOLUME24HOUR']) *
+            this.currentPrice[pair]['PRICE'] ) + this.currentPrice[pair]['VOLUME24HOURTO'];
+            this.currentPrice[pair]['FULLVOLUMETO'] = CCC.convertValueToDisplay(tsym, fullVolumeTo, 'short');
+        }
+        console.log(this.currentPrice);
+    }
+
+    /**
+     * Convert cryptocompare CURRENTAGG subscription socket data to a dictionary with a shape of CCCSocketDataModified.
+     */
+    private mapCURRENTAGGToCCCSocketModified(message: string): CCCSocketDataModified {
+        console.log(message);
         const unPackedData = CCC.CURRENT.unpack(message);
         const from: string = unPackedData['FROMSYMBOL'];
         const to: string = unPackedData['TOSYMBOL'];
-        const volume24hr: number = unPackedData['VOLUME24HOURTO'];
         const tsym: string = CCC.STATIC.CURRENCY.getSymbol(to);
         const pair = from + to;
 
-        if (!currentPrice.hasOwnProperty(pair)) {
-            currentPrice[pair] = {};
+        if (!this.currentPrice.hasOwnProperty(pair)) {
+            this.currentPrice[pair] = {};
         }
 
         for (const key in unPackedData) {
-            currentPrice[pair][key] = unPackedData[key];
+            this.currentPrice[pair][key] = unPackedData[key];
         }
 
-        if (currentPrice[pair]['LASTTRADEID']) {
-            currentPrice[pair]['LASTTRADEID'] = parseInt(currentPrice[pair]['LASTTRADEID']).toFixed(0);
+        if (this.currentPrice[pair]['LASTTRADEID']) {
+            this.currentPrice[pair]['LASTTRADEID'] = parseInt(this.currentPrice[pair]['LASTTRADEID']).toFixed(0);
         }
-        currentPrice[pair]['VOLUME24HOURTO'] =
-            CCC.convertValueToDisplay(tsym, volume24hr, 'short');
-        currentPrice[pair]['CHANGE24HOUR'] =
-            CCC.convertValueToDisplay(tsym, (currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']));
-        currentPrice[pair]['CHANGE24HOURPCT'] =
-            ((currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']) /
-            currentPrice[pair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
-        return currentPrice;
+        this.currentPrice[pair]['CHANGE24HOUR'] =
+            CCC.convertValueToDisplay(tsym, (this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']));
+        this.currentPrice[pair]['CHANGE24HOURPCT'] =
+            ((this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']) /
+            this.currentPrice[pair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
+        return this.currentPrice;
     }
 }
