@@ -46,6 +46,7 @@ export class CryptocompareSocketService {
         const unPackedData = CCC.CURRENT.unpack(message);
         const from: string = unPackedData['FROMSYMBOL'];
         const to: string = unPackedData['TOSYMBOL'];
+        const volume24hr: number = unPackedData['VOLUME24HOURTO'];
         const tsym: string = CCC.STATIC.CURRENCY.getSymbol(to);
         const pair = from + to;
 
@@ -60,6 +61,8 @@ export class CryptocompareSocketService {
         if (currentPrice[pair]['LASTTRADEID']) {
             currentPrice[pair]['LASTTRADEID'] = parseInt(currentPrice[pair]['LASTTRADEID']).toFixed(0);
         }
+        currentPrice[pair]['VOLUME24HOURTO'] =
+            CCC.convertValueToDisplay(tsym, volume24hr, 'short');
         currentPrice[pair]['CHANGE24HOUR'] =
             CCC.convertValueToDisplay(tsym, (currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']));
         currentPrice[pair]['CHANGE24HOURPCT'] =

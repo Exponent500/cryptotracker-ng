@@ -72,7 +72,7 @@ export class CoinsService {
             if (index !== -1) {
                 const socketDatum: SocketData = {
                     price: price,
-                    volume: CCC.convertValueToDisplay(tsym, socketData[key].VOLUME24HOURTO, 'short'),
+                    volume: socketData[key].VOLUME24HOURTO,
                     mcap: CCC.convertValueToDisplay(tsym, price * coinData[index].ConversionInfo.Supply, 'short'),
                     changePercent: socketData[key].CHANGE24HOURPCT,
                     flags: socketData[key].FLAGS
