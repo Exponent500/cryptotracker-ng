@@ -16,6 +16,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
   coinsDataToDisplay: CoinData[] = [];
   currencyTicker = 'USD';
   numberOfCoinsToDisplay = 10;
+  isStreaming = false;
 
   constructor(private coinsService: CoinsService) { }
 
@@ -25,7 +26,12 @@ export class CoinsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.map( subscription => subscription.unsubscribe());
-    this.coinsService.unSubscribeFromSocket();
+    this.coinsService.stopStream();
+  }
+
+  onChangeStreamingStatus() {
+    this.isStreaming = !this.coinsService.isStreaming;
+    this.isStreaming ?  this.coinsService.restartStream() : this.coinsService.stopStream();
   }
 
   /**
@@ -33,7 +39,10 @@ export class CoinsComponent implements OnInit, OnDestroy {
    */
   private getCoinData(currency: string, numberOfCoins: number) {
     this.getCoinDataSub = this.coinsService.getCoinData(currency, numberOfCoins)
-      .subscribe(coinData => this.coinsDataToDisplay = coinData);
+      .subscribe(coinData => {
+        this.coinsDataToDisplay = coinData;
+        this.isStreaming = this.coinsService.isStreaming;
+      });
     this.subscriptions.push(this.getCoinDataSub);
   }
 

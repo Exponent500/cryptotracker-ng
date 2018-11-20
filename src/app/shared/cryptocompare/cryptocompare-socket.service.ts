@@ -46,6 +46,10 @@ export class CryptocompareSocketService {
         this.socket.emit('SubRemove', { subs: this.socketSubscriptions });
     }
 
+    reSubscribe() {
+        this.socket.emit('SubAdd', { subs: this.socketSubscriptions });
+    }
+
 
     private addFullVolumeDataToCurrentPriceData = (message: string) => {
         console.log(message);

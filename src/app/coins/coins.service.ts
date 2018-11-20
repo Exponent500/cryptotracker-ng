@@ -11,6 +11,7 @@ import { CCC } from '../shared/cryptocompare/cryptocompare-socket.utilities';
 @Injectable()
 export class CoinsService {
     coinsDataToDisplay: CoinData[] = [];
+    isStreaming = false;
     constructor(private cryptoCompareDataService: CryptoCompareDataService,
                 private cryptocompareSocketService: CryptocompareSocketService) {}
 
@@ -55,12 +56,20 @@ export class CoinsService {
      * You should make sure you add subscriptions of interest before subscribing, otherwise no data will be emitted.
      */
     subscribeToSocket(): Observable<CCCSocketDataModified> {
+        this.isStreaming = true;
         return this.cryptocompareSocketService.onNewMessage();
     }
 
     // Unsubscribes from the cryptocompare socket.
-    unSubscribeFromSocket() {
+    stopStream() {
+        this.isStreaming = false;
         this.cryptocompareSocketService.unSubscribe();
+    }
+
+    // Restarts a stream that was stopped.
+    restartStream() {
+        this.isStreaming = true;
+        this.cryptocompareSocketService.reSubscribe();
     }
 
     /**
