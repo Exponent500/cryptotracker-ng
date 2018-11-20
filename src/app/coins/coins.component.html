@@ -15,9 +15,9 @@
           <td class="icon">
             <img [src]="'https://www.cryptocompare.com' + data.CoinInfo.ImageUrl">
           <td class="name">
-            <span>{{data.CoinInfo.FullName}}</span>
+            <span class="full-name">{{data.CoinInfo.FullName}}</span>
             <br>
-            <span>{{data.CoinInfo.Name}}</span>
+            <span class="ticker">{{data.CoinInfo.Name}}</span>
           </td>
           <td class="price">
             <div class="price-value" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">

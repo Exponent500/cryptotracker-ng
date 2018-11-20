@@ -43,6 +43,10 @@
 
             &.name {
                 border-left: 0;
+
+                .full-name {
+                    font-weight: bold;
+                }
             }
 
             &.price {

@@ -15,8 +15,8 @@ export class CoinsService {
     /**
      * Gets coin data in a format that a consumer can display on the view.
      */
-    getCoinData(): Observable<CoinData[]> {
-        return this.getTopCoinsByTotalVolume()
+    getCoinData(currency: string, numberOfCoins: number): Observable<CoinData[]> {
+        return this.getTopCoinsByTotalVolume(currency, numberOfCoins)
             .pipe(
                 mergeMap( response => {
                     const topCoinsByTotalVolumeData = response.Data;
@@ -33,8 +33,8 @@ export class CoinsService {
     /**
      * Gets cryptocompare's "TopCoinsByTotalVolume" data.
      */
-    getTopCoinsByTotalVolume(): Observable<TopCoinsByTotalVolumeResponse> {
-        return this.cryptoCompareDataService.getTopCoinsByTotalVolume();
+    getTopCoinsByTotalVolume(currency: string, numberOfCoins: number): Observable<TopCoinsByTotalVolumeResponse> {
+        return this.cryptoCompareDataService.getTopCoinsByTotalVolume(currency, numberOfCoins);
     }
 
     /**
