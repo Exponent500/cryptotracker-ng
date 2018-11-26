@@ -1,5 +1,8 @@
 <div id="main-container">
     <app-header></app-header>
+    <mat-progress-bar
+        *ngIf="loading" mode="indeterminate">
+    </mat-progress-bar>
     <div class="container">
         <router-outlet></router-outlet>
     </div>

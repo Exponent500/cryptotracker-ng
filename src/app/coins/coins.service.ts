@@ -18,22 +18,16 @@ export class CoinsService {
     /**
      * Gets coin data in a format that a consumer can display on the view.
      */
-    getCoinData(currency: string, numberOfCoins: number): Observable<CoinData[]> {
-        return this.getTopCoinsByTotalVolume(currency, numberOfCoins)
+    getRealTimeCoinData(topCoinsByTotalVolumeData: any): Observable<CoinData[]> {
+        const cryptocompareSubscriptionsToAdd = [];
+        topCoinsByTotalVolumeData.forEach( item => {
+            cryptocompareSubscriptionsToAdd.push(item.ConversionInfo.SubsNeeded[0]);
+            cryptocompareSubscriptionsToAdd.push(`11~${item.ConversionInfo.CurrencyFrom}`);
+        });
+        this.addSocketSubscriptions(cryptocompareSubscriptionsToAdd);
+        return this.subscribeToSocket()
             .pipe(
-                mergeMap( response => {
-                    const topCoinsByTotalVolumeData = response.Data;
-                    const cryptocompareSubscriptionsToAdd = [];
-                    topCoinsByTotalVolumeData.forEach( item => {
-                        cryptocompareSubscriptionsToAdd.push(item.ConversionInfo.SubsNeeded[0]);
-                        cryptocompareSubscriptionsToAdd.push(`11~${item.ConversionInfo.CurrencyFrom}`);
-                    });
-                    this.addSocketSubscriptions(cryptocompareSubscriptionsToAdd);
-                    return this.subscribeToSocket()
-                        .pipe(
-                            map(socketData => this.addSocketDataToCoinData(socketData, topCoinsByTotalVolumeData))
-                        );
-                })
+                map(socketData => this.addSocketDataToCoinData(socketData, topCoinsByTotalVolumeData))
             );
     }
 

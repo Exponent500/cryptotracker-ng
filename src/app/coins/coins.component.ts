@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 
 import { CoinsService } from './coins.service';
 import { CoinData } from '../shared/cryptocompare/interfaces';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-coins',
@@ -14,14 +15,22 @@ export class CoinsComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   getCoinDataSub: Subscription = new Subscription();
   coinsDataToDisplay: CoinData[] = [];
-  currencyTicker = 'USD';
-  numberOfCoinsToDisplay = 10;
   isStreaming = false;
+  loading = true;
 
-  constructor(private coinsService: CoinsService) { }
+  constructor(private coinsService: CoinsService,
+              private route: ActivatedRoute) { }
 
   ngOnInit() {
-    this.getCoinData(this.currencyTicker, this.numberOfCoinsToDisplay);
+    this.route.data.subscribe(
+      data => {
+        this.coinsService.getRealTimeCoinData(data['coinsByTotalVolume'].Data)
+          .subscribe(coinData => {
+            this.loading = false;
+            this.coinsDataToDisplay = coinData;
+            this.isStreaming = this.coinsService.isStreaming;
+          });
+      });
   }
 
   ngOnDestroy() {
@@ -33,17 +42,4 @@ export class CoinsComponent implements OnInit, OnDestroy {
     this.isStreaming = !this.coinsService.isStreaming;
     this.isStreaming ?  this.coinsService.restartStream() : this.coinsService.stopStream();
   }
-
-  /**
-   * Gets coin data for the currency and numberOfCoins provided
-   */
-  private getCoinData(currency: string, numberOfCoins: number) {
-    this.getCoinDataSub = this.coinsService.getCoinData(currency, numberOfCoins)
-      .subscribe(coinData => {
-        this.coinsDataToDisplay = coinData;
-        this.isStreaming = this.coinsService.isStreaming;
-      });
-    this.subscriptions.push(this.getCoinDataSub);
-  }
-
 }
