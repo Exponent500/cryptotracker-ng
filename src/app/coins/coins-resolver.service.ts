@@ -8,12 +8,13 @@ import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-
 
 @Injectable()
 export class CoinsByTotalVolumeResolver implements Resolve<TopCoinsByTotalVolumeResponse> {
-    currency = 'USD';
     numberOfCoins = 10;
 
     constructor(private cryptoCompareDataService: CryptoCompareDataService) {}
      resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<TopCoinsByTotalVolumeResponse> {
+        const coinToCurrency = route.params.coinToCurrency;
+        const page = route.params.page;
         console.log('in resolver');
-        return this.cryptoCompareDataService.getTopCoinsByTotalVolume(this.currency, this.numberOfCoins);
+        return this.cryptoCompareDataService.getTopCoinsByTotalVolume(coinToCurrency, this.numberOfCoins);
     }
 }

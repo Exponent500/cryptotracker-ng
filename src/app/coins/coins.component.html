@@ -1,4 +1,12 @@
 <div class="wrapper">
+  <header>
+    <h1>Coins List</h1>
+    <ul class="nav nav-tabs">
+      <li *ngFor="let tab of currencyToTabs">
+        <a (click)="onChangeCurrencyTo(tab)">{{tab}}</a>
+      </li>
+    </ul>
+  </header>
   <div class="spinner-wrapper" *ngIf="loading">
       <mat-spinner></mat-spinner>
   </div> 
@@ -25,7 +33,7 @@
             </td>
             <td class="price">
               <div class="price-value" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
-                  {{data.SocketData?.price | currency:'USD':'symbol':'1.0-6' }}
+                  {{data.SocketData?.price}}
               </div>
             </td>
             <td class="volume">

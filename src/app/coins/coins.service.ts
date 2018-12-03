@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-data.service';
 import { CoinData, SocketData, CCCSocketDataModified, TopCoinsByTotalVolumeResponse } from '../shared/cryptocompare/interfaces';
@@ -19,16 +19,33 @@ export class CoinsService {
      * Gets coin data in a format that a consumer can display on the view.
      */
     getRealTimeCoinData(topCoinsByTotalVolumeData: any): Observable<CoinData[]> {
-        const cryptocompareSubscriptionsToAdd = [];
-        topCoinsByTotalVolumeData.forEach( item => {
-            cryptocompareSubscriptionsToAdd.push(item.ConversionInfo.SubsNeeded[0]);
-            cryptocompareSubscriptionsToAdd.push(`11~${item.ConversionInfo.CurrencyFrom}`);
-        });
+        const cryptocompareSubscriptionsToAdd: string[] = this.generateCryptocompareSubscriptions(topCoinsByTotalVolumeData);
         this.addSocketSubscriptions(cryptocompareSubscriptionsToAdd);
         return this.subscribeToSocket()
             .pipe(
                 map(socketData => this.addSocketDataToCoinData(socketData, topCoinsByTotalVolumeData))
             );
+    }
+
+    generateCryptocompareSubscriptions(cryptocompareData: any): any {
+        const cryptocompareSubscriptionsToAdd = [];
+        cryptocompareData.forEach( item => {
+            const currencyFrom: string = item.ConversionInfo.CurrencyFrom;
+            const currencyTo: string = item.ConversionInfo.CurrencyTo;
+            const market: string = item.ConversionInfo.Market;
+            const subscriptionBase: string = item.ConversionInfo.SubBase;
+            const subsNeeded: string[] = item.ConversionInfo.SubsNeeded;
+            const AGGsubscriptionToAdd = `${subscriptionBase}${market}~${currencyFrom}~${currencyTo}`;
+            const totalVolumeSubscriptionToAdd = `11~${currencyFrom}`;
+
+            if (item.ConversionInfo.Conversion === 'multiply') {
+                cryptocompareSubscriptionsToAdd.push(...subsNeeded);
+            } else {
+                cryptocompareSubscriptionsToAdd.push(AGGsubscriptionToAdd);
+            }
+            cryptocompareSubscriptionsToAdd.push(totalVolumeSubscriptionToAdd);
+        });
+        return cryptocompareSubscriptionsToAdd;
     }
 
     /**
@@ -72,25 +89,26 @@ export class CoinsService {
     private addSocketDataToCoinData(socketData: CCCSocketDataModified, coinData: CoinData[]) {
         console.log(socketData);
         const keys = Object.keys(socketData);
+        const tsym = CCC.STATIC.CURRENCY.getSymbol(this.cryptoCompareDataService.coinToCurrency);
         keys.forEach( key => {
-            const tsym = CCC.STATIC.CURRENCY.getSymbol(socketData[key].TOSYMBOL);
             const price = socketData[key].PRICE;
+            console.log(price);
             const index = coinData.findIndex( datum => {
                 return (key === (datum.ConversionInfo.CurrencyFrom + datum.ConversionInfo.CurrencyTo));
             });
             if (index !== -1) {
                 const socketDatum: SocketData = {
-                    price: price,
+                    price: CCC.convertValueToDisplay(tsym, price),
                     volume: socketData[key].FULLVOLUMETO ?
                             socketData[key].FULLVOLUMETO :
                             CCC.convertValueToDisplay(tsym, socketData[key].FULLVOLUMEFROM * price, 'short'),
                     mcap: CCC.convertValueToDisplay(tsym, price * coinData[index].ConversionInfo.Supply, 'short'),
                     changePercent: socketData[key].CHANGE24HOURPCT,
                     flags: socketData[key].FLAGS
-            };
-            coinData[index].SocketData = socketDatum;
-            this.coinsDataToDisplay = coinData;
-            console.log(this.coinsDataToDisplay);
+                };
+                coinData[index].SocketData = socketDatum;
+                this.coinsDataToDisplay = coinData;
+                console.log(this.coinsDataToDisplay);
             }
         });
         return this.coinsDataToDisplay;

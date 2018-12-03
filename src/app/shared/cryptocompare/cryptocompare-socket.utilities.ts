@@ -41,7 +41,8 @@ CCC.STATIC.CURRENCY.SYMBOL = {
     'ETH': 'Ξ',
     'GOLD': 'Gold g',
     'INR': '₹',
-    'BRL': 'R$'
+    'BRL': 'R$',
+    'KRW': '₩'
 };
 
 // Returns the currency symbol associated with a specific currency ticker name.

@@ -4,7 +4,9 @@ import { CoinsComponent } from './coins.component';
 import { CoinsByTotalVolumeResolver } from './coins-resolver.service';
 
 const coinsRoutes: Routes = [
-    { path: '', component: CoinsComponent, resolve: { coinsByTotalVolume: CoinsByTotalVolumeResolver } }
+    { path: '', children: [
+        { path: ':coinToCurrency/:page', component: CoinsComponent, resolve: { coinsByTotalVolume: CoinsByTotalVolumeResolver } }
+    ]}
 ];
 
 @NgModule({
