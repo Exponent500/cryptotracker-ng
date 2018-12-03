@@ -23,7 +23,7 @@ interface ConversionInfo {
     CurrencyTo: string;
     Market: string;
     RAW: string[];
-    Subbase: string;
+    SubBase: string;
     SubsNeeded: string[];
     Supply: number;
     TotalVolume24H: number;
@@ -40,6 +40,9 @@ export interface SocketData {
 export interface CoinData {
     CoinInfo: CoinInfo;
     ConversionInfo: ConversionInfo;
+}
+
+export interface CoinDataWithSocketData extends CoinData {
     SocketData?: SocketData;
 }
 

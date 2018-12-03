@@ -23,7 +23,6 @@ export class CryptocompareSocketService {
      */
     addSubscriptions(subscriptions: string[]) {
         this.socketSubscriptions = subscriptions;
-        console.log(subscriptions);
         this.socket.emit('SubAdd', { subs: subscriptions });
     }
 
@@ -45,21 +44,22 @@ export class CryptocompareSocketService {
     }
 
     /**
-     * Unsubscribes from all socket subscriptions that are currently being subscribed to.
+     * Un-subscribes from all socket subscriptions that are currently being subscribed to.
      */
     unSubscribe() {
         this.socket.emit('SubRemove', { subs: this.socketSubscriptions });
     }
 
+    /**
+     * Re-subscribes to all existing subscriptions.
+     */
     reSubscribe() {
         this.socket.emit('SubAdd', { subs: this.socketSubscriptions });
     }
 
 
     private addFullVolumeDataToCurrentPriceData = (message: string) => {
-        console.log(message);
         const volData = CCC.FULLVOLUME.unpack(message);
-        console.log(volData);
         const from = volData['SYMBOL'];
         const to = this.cryptocompareDataService.coinToCurrency;
         const tsym = CCC.STATIC.CURRENCY.getSymbol(to);
@@ -81,16 +81,13 @@ export class CryptocompareSocketService {
                 this.currentPrice[pair]['PRICE'] ) + this.currentPrice[pair]['VOLUME24HOURTO'];
             this.currentPrice[pair]['FULLVOLUMETO'] = CCC.convertValueToDisplay(tsym, fullVolumeTo, 'short');
         }
-        console.log(this.currentPrice);
     }
 
     /**
      * Convert cryptocompare CURRENTAGG subscription socket data to a dictionary with a shape of CCCSocketDataModified.
      */
     private mapCURRENTAGGToCCCSocketModified(message: string): CCCSocketDataModified {
-        console.log(message);
         const unPackedData = CCC.CURRENT.unpack(message);
-        console.log(unPackedData);
         const from: string = unPackedData['FROMSYMBOL'];
         let to: string = unPackedData['TOSYMBOL'];
         const price: number = unPackedData['PRICE'];
@@ -99,7 +96,6 @@ export class CryptocompareSocketService {
 
         if (pair === 'BTC' + this.cryptocompareDataService.coinToCurrency) {
             this.BTCPriceInConversionCurrency = unPackedData.PRICE;
-            console.log(this.BTCPriceInConversionCurrency);
         } else if (pair === 'ETH' + this.cryptocompareDataService.coinToCurrency) {
             this.ETHPriceInConversionCurrency = unPackedData.PRICE;
         }
@@ -115,20 +111,15 @@ export class CryptocompareSocketService {
         if (to !== this.cryptocompareDataService.coinToCurrency) {
             tsym = CCC.STATIC.CURRENCY.getSymbol(to);
             pair = from + this.cryptocompareDataService.coinToCurrency;
-            console.log(unPackedData);
             for (const key in unPackedData) {
-                console.log(unPackedData[key]);
                 this.currentPrice[pair][key] = unPackedData[key];
             }
 
             if (to === from) {
-                console.log(to, from);
                 this.currentPrice[pair]['PRICE'] = 1;
                 this.currentPrice[pair]['OPEN24HOUR'] = 1;
             }
             
-            console.log(this.currentPrice[pair]);
-
             let conversionCurrency;
 
             if (to === 'BTC') {
@@ -136,7 +127,6 @@ export class CryptocompareSocketService {
             } else if (to === 'ETH') {
                 conversionCurrency = this.ETHPriceInConversionCurrency;
             }
-            console.log(conversionCurrency);
 
             this.currentPrice[pair]['CHANGE24HOUR'] =
                 CCC.convertValueToDisplay(tsym, (this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']) * conversionCurrency);
@@ -152,7 +142,6 @@ export class CryptocompareSocketService {
         }
 
         if (to === from) {
-            console.log(to, from);
             this.currentPrice[pair]['PRICE'] = 1;
             this.currentPrice[pair]['OPEN24HOUR'] = 1;
         }

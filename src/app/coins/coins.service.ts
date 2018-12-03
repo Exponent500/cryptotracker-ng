@@ -4,21 +4,27 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-data.service';
-import { CoinData, SocketData, CCCSocketDataModified, TopCoinsByTotalVolumeResponse } from '../shared/cryptocompare/interfaces';
+import {
+    CoinData,
+    SocketData,
+    CCCSocketDataModified,
+    TopCoinsByTotalVolumeResponse,
+    CoinDataWithSocketData } from '../shared/cryptocompare/interfaces';
 import { CryptocompareSocketService } from '../shared/cryptocompare/cryptocompare-socket.service';
 import { CCC } from '../shared/cryptocompare/cryptocompare-socket.utilities';
 
 @Injectable()
 export class CoinsService {
-    coinsDataToDisplay: CoinData[] = [];
+    coinsDataToDisplay: CoinDataWithSocketData[] = [];
     isStreaming = false;
     constructor(private cryptoCompareDataService: CryptoCompareDataService,
                 private cryptocompareSocketService: CryptocompareSocketService) {}
 
+
     /**
-     * Gets coin data in a format that a consumer can display on the view.
+     * Gets real-time coin data in a format that a consumer can display on the view.
      */
-    getRealTimeCoinData(topCoinsByTotalVolumeData: any): Observable<CoinData[]> {
+    getRealTimeCoinData(topCoinsByTotalVolumeData: CoinData[]): Observable<CoinDataWithSocketData[]> {
         const cryptocompareSubscriptionsToAdd: string[] = this.generateCryptocompareSubscriptions(topCoinsByTotalVolumeData);
         this.addSocketSubscriptions(cryptocompareSubscriptionsToAdd);
         return this.subscribeToSocket()
@@ -27,7 +33,8 @@ export class CoinsService {
             );
     }
 
-    generateCryptocompareSubscriptions(cryptocompareData: any): any {
+    // Generates the crypto compare subscriptions of interest
+    generateCryptocompareSubscriptions(cryptocompareData: CoinData[]): string[] {
         const cryptocompareSubscriptionsToAdd = [];
         cryptocompareData.forEach( item => {
             const currencyFrom: string = item.ConversionInfo.CurrencyFrom;
@@ -86,13 +93,11 @@ export class CoinsService {
     /**
      * Takes cryptocompare socket data and adds it to coin data.
      */
-    private addSocketDataToCoinData(socketData: CCCSocketDataModified, coinData: CoinData[]) {
-        console.log(socketData);
+    private addSocketDataToCoinData(socketData: CCCSocketDataModified, coinData: CoinData[]): CoinDataWithSocketData[] {
         const keys = Object.keys(socketData);
         const tsym = CCC.STATIC.CURRENCY.getSymbol(this.cryptoCompareDataService.coinToCurrency);
         keys.forEach( key => {
             const price = socketData[key].PRICE;
-            console.log(price);
             const index = coinData.findIndex( datum => {
                 return (key === (datum.ConversionInfo.CurrencyFrom + datum.ConversionInfo.CurrencyTo));
             });
@@ -106,9 +111,7 @@ export class CoinsService {
                     changePercent: socketData[key].CHANGE24HOURPCT,
                     flags: socketData[key].FLAGS
                 };
-                coinData[index].SocketData = socketDatum;
-                this.coinsDataToDisplay = coinData;
-                console.log(this.coinsDataToDisplay);
+                this.coinsDataToDisplay[index].SocketData = socketDatum;
             }
         });
         return this.coinsDataToDisplay;
