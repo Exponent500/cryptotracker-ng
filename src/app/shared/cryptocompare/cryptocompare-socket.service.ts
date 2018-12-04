@@ -10,7 +10,7 @@ import { CryptoCompareDataService } from '../cryptocompare/cryptocompare-data.se
 export class CryptocompareSocketService {
     private socket: SocketIOClient.Socket;
     private socketSubscriptions: string [] = [];
-    private currentPrice = {};
+    private currentCoinSocketData = {};
     private BTCPriceInConversionCurrency: number;
     private ETHPriceInConversionCurrency: number;
 
@@ -37,7 +37,7 @@ export class CryptocompareSocketService {
                 if (messageType === CCC.STATIC.TYPE.CURRENTAGG) {
                     observer.next(this.mapCURRENTAGGToCCCSocketModified(message));
                 } else if (messageType === CCC.STATIC.TYPE.FULLVOLUME) {
-                    this.addFullVolumeDataToCurrentPriceData(message);
+                    this.addFullVolumeDataToCurrentCoinSocketData(message);
                 }
             });
         });
@@ -58,99 +58,105 @@ export class CryptocompareSocketService {
     }
 
 
-    private addFullVolumeDataToCurrentPriceData = (message: string) => {
-        const volData = CCC.FULLVOLUME.unpack(message);
-        const from = volData['SYMBOL'];
-        const to = this.cryptocompareDataService.coinToCurrency;
-        const tsym = CCC.STATIC.CURRENCY.getSymbol(to);
-        const pair = from + to;
+    /**
+     * Adds socket volume data to the appropriate currencyPair key within the master currentCoinSocketData object
+     */
+    private addFullVolumeDataToCurrentCoinSocketData (socketVolumeData: string) {
+        const socketVolumeDataUnPacked = CCC.FULLVOLUME.unpack(socketVolumeData);
+        const socketDataCurrencyFromTicker = socketVolumeDataUnPacked['SYMBOL'];
+        const currencyToConvertToTicker = this.cryptocompareDataService.coinToCurrency;
+        const currencyToConvertToSymbol = CCC.STATIC.CURRENCY.getSymbol(currencyToConvertToTicker);
+        const currencyPair = socketDataCurrencyFromTicker + currencyToConvertToTicker;
 
-        if (!this.currentPrice.hasOwnProperty(pair)) {
-            this.currentPrice[pair] = {};
+        if (!this.currentCoinSocketData.hasOwnProperty(currencyPair)) {
+            this.currentCoinSocketData[currencyPair] = {};
         }
 
-        this.currentPrice[pair]['FULLVOLUMEFROM'] = parseFloat(volData['FULLVOLUME']);
+        this.currentCoinSocketData[currencyPair]['FULLVOLUMEFROM'] = parseFloat(socketVolumeDataUnPacked['FULLVOLUME']);
 
-        if (pair === 'BTCBTC') {
-            this.currentPrice[pair]['FULLVOLUMETO'] = CCC.convertValueToDisplay(tsym, this.currentPrice[pair]['FULLVOLUMEFROM'], 'short');
+        if (currencyPair === 'BTCBTC') {
+            this.currentCoinSocketData[currencyPair]['FULLVOLUMETO'] =
+                CCC.convertValueToDisplay(currencyToConvertToSymbol, this.currentCoinSocketData[currencyPair]['FULLVOLUMEFROM'], 'short');
             return;
         }
 
-        if (this.currentPrice[pair]['PRICE']) {
-            const fullVolumeTo = ( (this.currentPrice[pair]['FULLVOLUMEFROM'] - this.currentPrice[pair]['VOLUME24HOUR']) *
-                this.currentPrice[pair]['PRICE'] ) + this.currentPrice[pair]['VOLUME24HOURTO'];
-            this.currentPrice[pair]['FULLVOLUMETO'] = CCC.convertValueToDisplay(tsym, fullVolumeTo, 'short');
+        if (this.currentCoinSocketData[currencyPair]['PRICE']) {
+            const fullVolumeTo = (
+                (this.currentCoinSocketData[currencyPair]['FULLVOLUMEFROM'] - this.currentCoinSocketData[currencyPair]['VOLUME24HOUR']) *
+                this.currentCoinSocketData[currencyPair]['PRICE'] ) + this.currentCoinSocketData[currencyPair]['VOLUME24HOURTO'];
+            this.currentCoinSocketData[currencyPair]['FULLVOLUMETO'] =
+                CCC.convertValueToDisplay(currencyToConvertToSymbol, fullVolumeTo, 'short');
         }
     }
 
     /**
-     * Convert cryptocompare CURRENTAGG subscription socket data to a dictionary with a shape of CCCSocketDataModified.
+     * Convert cryptocompare CURRENTAGG subscription socket data to a CCCSocketDataModified dictionary object.
      */
-    private mapCURRENTAGGToCCCSocketModified(message: string): CCCSocketDataModified {
-        const unPackedData = CCC.CURRENT.unpack(message);
-        const from: string = unPackedData['FROMSYMBOL'];
-        let to: string = unPackedData['TOSYMBOL'];
-        const price: number = unPackedData['PRICE'];
-        let tsym: string = CCC.STATIC.CURRENCY.getSymbol(to);
-        let pair = from + to;
+    private mapCURRENTAGGToCCCSocketModified(socketCurrentAGGData: string): CCCSocketDataModified {
+        const currencyToConvertToTicker = this.cryptocompareDataService.coinToCurrency;
+        const socketCurrentAGGDataUnPacked = CCC.CURRENT.unpack(socketCurrentAGGData);
+        const socketDataCurrencyFromTicker: string = socketCurrentAGGDataUnPacked['FROMSYMBOL'];
+        const socketDataCurrencyToTicker: string = socketCurrentAGGDataUnPacked['TOSYMBOL'];
+        const price: number = socketCurrentAGGDataUnPacked['PRICE'];
+        const socketDataCurrencyToSymbol: string = CCC.STATIC.CURRENCY.getSymbol(socketDataCurrencyToTicker);
+        let currencyPair = socketDataCurrencyFromTicker + socketDataCurrencyToTicker;
+        let BTCorETHPriceInConversionCurrency;
 
-        if (pair === 'BTC' + this.cryptocompareDataService.coinToCurrency) {
-            this.BTCPriceInConversionCurrency = unPackedData.PRICE;
-        } else if (pair === 'ETH' + this.cryptocompareDataService.coinToCurrency) {
-            this.ETHPriceInConversionCurrency = unPackedData.PRICE;
+        // Saves BTC and ETH prices in the currently selected conversion currency (USD, JPY, etc) for future use.
+        // This is because there are some coins that do not have direct pairs with all the possible conversion currencies that we support.
+        // For example ZEC may only have a ZECBTC or ZECETH pair, but NOT a ZECJPY pair. In this case we can multiply the ZECBTC pair
+        // by the BTCPJY data to get our ZECJPY data.
+        if (currencyPair === `BTC${currencyToConvertToTicker}`) {
+            this.BTCPriceInConversionCurrency = socketCurrentAGGDataUnPacked.PRICE;
+        } else if (currencyPair === `ETH${currencyToConvertToTicker}`) {
+            this.ETHPriceInConversionCurrency = socketCurrentAGGDataUnPacked.PRICE;
         }
 
-        if (!this.currentPrice.hasOwnProperty(pair)) {
-            this.currentPrice[pair] = {};
+        if (!this.currentCoinSocketData.hasOwnProperty(currencyPair)) {
+            this.currentCoinSocketData[currencyPair] = {};
         }
 
-        // if socketData's TOSYMBOL property does not equal the currencyToSymbol property within the
-        // cryptocompareDataService, then this is an indication that the coin in question does not have a direct
-        // pair with the currencyToSymbol property, and will need to multiply it's values by the values within the BTC to
-        // currencyToSymbol pair.
-        if (to !== this.cryptocompareDataService.coinToCurrency) {
-            tsym = CCC.STATIC.CURRENCY.getSymbol(to);
-            pair = from + this.cryptocompareDataService.coinToCurrency;
-            for (const key in unPackedData) {
-                this.currentPrice[pair][key] = unPackedData[key];
+        // Special case where the socketData's TOSYMBOL does not match the currency we want to convert to. This indicates we received
+        // socket data for a coin that does NOT have a direct pair with the currency we are looking to convert to.
+        // In this case we must need to multiply it's values by the values within the BTC (or ETH) to currencyToConvertToTicker pair.
+        if (socketDataCurrencyToTicker !== currencyToConvertToTicker) {
+            currencyPair = socketDataCurrencyFromTicker + currencyToConvertToTicker;
+            for (const key of Object.keys(socketCurrentAGGDataUnPacked)) {
+                this.currentCoinSocketData[currencyPair][key] = socketCurrentAGGDataUnPacked[key];
             }
 
-            if (to === from) {
-                this.currentPrice[pair]['PRICE'] = 1;
-                this.currentPrice[pair]['OPEN24HOUR'] = 1;
-            }
-            
-            let conversionCurrency;
-
-            if (to === 'BTC') {
-                conversionCurrency = this.BTCPriceInConversionCurrency;
-            } else if (to === 'ETH') {
-                conversionCurrency = this.ETHPriceInConversionCurrency;
+            if (socketDataCurrencyToTicker === 'BTC') {
+                BTCorETHPriceInConversionCurrency = this.BTCPriceInConversionCurrency;
+            } else if (socketDataCurrencyToTicker === 'ETH') {
+                BTCorETHPriceInConversionCurrency = this.ETHPriceInConversionCurrency;
             }
 
-            this.currentPrice[pair]['CHANGE24HOUR'] =
-                CCC.convertValueToDisplay(tsym, (this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']) * conversionCurrency);
-            this.currentPrice[pair]['CHANGE24HOURPCT'] =
-                ( (this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']) /
-                this.currentPrice[pair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
-            this.currentPrice[pair]['PRICE'] = price * conversionCurrency;
-            return this.currentPrice;
+            this.currentCoinSocketData[currencyPair]['CHANGE24HOUR'] =
+                CCC.convertValueToDisplay(socketDataCurrencyToSymbol,
+                    (this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']) *
+                    BTCorETHPriceInConversionCurrency);
+            this.currentCoinSocketData[currencyPair]['CHANGE24HOURPCT'] =
+                ( (this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']) /
+                this.currentCoinSocketData[currencyPair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
+            this.currentCoinSocketData[currencyPair]['PRICE'] = price * BTCorETHPriceInConversionCurrency;
+            return this.currentCoinSocketData;
         }
 
-        for (const key in unPackedData) {
-            this.currentPrice[pair][key] = unPackedData[key];
+        for (const key of Object.keys(socketCurrentAGGDataUnPacked)) {
+            this.currentCoinSocketData[currencyPair][key] = socketCurrentAGGDataUnPacked[key];
         }
 
-        if (to === from) {
-            this.currentPrice[pair]['PRICE'] = 1;
-            this.currentPrice[pair]['OPEN24HOUR'] = 1;
+        if (socketDataCurrencyToTicker === socketDataCurrencyFromTicker) {
+            this.currentCoinSocketData[currencyPair]['PRICE'] = 1;
+            this.currentCoinSocketData[currencyPair]['OPEN24HOUR'] = 1;
         }
 
-        this.currentPrice[pair]['CHANGE24HOUR'] =
-            CCC.convertValueToDisplay(tsym, (this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']));
-        this.currentPrice[pair]['CHANGE24HOURPCT'] =
-            ((this.currentPrice[pair]['PRICE'] - this.currentPrice[pair]['OPEN24HOUR']) /
-            this.currentPrice[pair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
-        return this.currentPrice;
+        this.currentCoinSocketData[currencyPair]['CHANGE24HOUR'] =
+            CCC.convertValueToDisplay(socketDataCurrencyToSymbol,
+                (this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']));
+        this.currentCoinSocketData[currencyPair]['CHANGE24HOURPCT'] =
+            ((this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']) /
+            this.currentCoinSocketData[currencyPair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
+        return this.currentCoinSocketData;
     }
 }
