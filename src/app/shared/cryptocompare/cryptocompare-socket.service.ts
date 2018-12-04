@@ -112,15 +112,16 @@ export class CryptocompareSocketService {
             this.ETHPriceInConversionCurrency = socketCurrentAGGDataUnPacked.PRICE;
         }
 
-        if (!this.currentCoinSocketData.hasOwnProperty(currencyPair)) {
-            this.currentCoinSocketData[currencyPair] = {};
-        }
-
         // Special case where the socketData's TOSYMBOL does not match the currency we want to convert to. This indicates we received
         // socket data for a coin that does NOT have a direct pair with the currency we are looking to convert to.
-        // In this case we must need to multiply it's values by the values within the BTC (or ETH) to currencyToConvertToTicker pair.
+        // In this case we need to multiply it's values by the values within the BTC (or ETH) to currencyToConvertToTicker pair.
         if (socketDataCurrencyToTicker !== currencyToConvertToTicker) {
             currencyPair = socketDataCurrencyFromTicker + currencyToConvertToTicker;
+
+            if (!this.currentCoinSocketData.hasOwnProperty(currencyPair)) {
+                this.currentCoinSocketData[currencyPair] = {};
+            }
+
             for (const key of Object.keys(socketCurrentAGGDataUnPacked)) {
                 this.currentCoinSocketData[currencyPair][key] = socketCurrentAGGDataUnPacked[key];
             }
@@ -131,15 +132,22 @@ export class CryptocompareSocketService {
                 BTCorETHPriceInConversionCurrency = this.ETHPriceInConversionCurrency;
             }
 
-            this.currentCoinSocketData[currencyPair]['CHANGE24HOUR'] =
+            if (price) {
+                this.currentCoinSocketData[currencyPair]['CHANGE24HOUR'] =
                 CCC.convertValueToDisplay(socketDataCurrencyToSymbol,
                     (this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']) *
                     BTCorETHPriceInConversionCurrency);
-            this.currentCoinSocketData[currencyPair]['CHANGE24HOURPCT'] =
-                ( (this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']) /
-                this.currentCoinSocketData[currencyPair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
-            this.currentCoinSocketData[currencyPair]['PRICE'] = price * BTCorETHPriceInConversionCurrency;
+                this.currentCoinSocketData[currencyPair]['CHANGE24HOURPCT'] =
+                    ( (this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']) /
+                    this.currentCoinSocketData[currencyPair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
+                this.currentCoinSocketData[currencyPair]['PRICE'] = price * BTCorETHPriceInConversionCurrency;
+                return this.currentCoinSocketData;
+            }
             return this.currentCoinSocketData;
+        }
+
+        if (!this.currentCoinSocketData.hasOwnProperty(currencyPair)) {
+            this.currentCoinSocketData[currencyPair] = {};
         }
 
         for (const key of Object.keys(socketCurrentAGGDataUnPacked)) {
@@ -151,12 +159,15 @@ export class CryptocompareSocketService {
             this.currentCoinSocketData[currencyPair]['OPEN24HOUR'] = 1;
         }
 
-        this.currentCoinSocketData[currencyPair]['CHANGE24HOUR'] =
+        if (price) {
+            this.currentCoinSocketData[currencyPair]['CHANGE24HOUR'] =
             CCC.convertValueToDisplay(socketDataCurrencyToSymbol,
                 (this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']));
-        this.currentCoinSocketData[currencyPair]['CHANGE24HOURPCT'] =
-            ((this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']) /
-            this.currentCoinSocketData[currencyPair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
+            this.currentCoinSocketData[currencyPair]['CHANGE24HOURPCT'] =
+                ((this.currentCoinSocketData[currencyPair]['PRICE'] - this.currentCoinSocketData[currencyPair]['OPEN24HOUR']) /
+                this.currentCoinSocketData[currencyPair]['OPEN24HOUR'] * 100).toFixed(2) + '%';
+            return this.currentCoinSocketData;
+        }
         return this.currentCoinSocketData;
     }
 }
