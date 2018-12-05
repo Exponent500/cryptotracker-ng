@@ -17,10 +17,11 @@ export class CryptoCompareDataService {
      * Fetches top coins sorted by total volume, sorted by volume and priced in the currencySymbol provided.
      * @param currencySymbol - the conversion currency of interest
      * @param numberOfCoins - number of coins to get data for
+     * @param page - page of results
      */
-    getTopCoinsByTotalVolume(conversionCurrency: string, numberOfCoins: number): Observable<TopCoinsByTotalVolumeResponse> {
+    getTopCoinsByTotalVolume(conversionCurrency: string, numberOfCoins: number, page: number): Observable<TopCoinsByTotalVolumeResponse> {
         this.coinToCurrency = conversionCurrency;
-        const params = new HttpParams().set('tsym', conversionCurrency).set('limit', numberOfCoins.toString());
+        const params = new HttpParams().set('tsym', conversionCurrency).set('limit', numberOfCoins.toString()).set('page', page.toString());
         return this.httpClient.get<TopCoinsByTotalVolumeResponse>(TOP_COINS_BY_TOTAL_VOLUME_URL, { params: params });
     }
 }

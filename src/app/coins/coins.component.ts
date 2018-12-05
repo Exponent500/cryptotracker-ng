@@ -49,11 +49,35 @@ export class CoinsComponent implements OnInit, OnDestroy {
     if (this.activeCurrencyConversionTab === ticker) {
       return;
     }
+    this.currentPage = 1;
     this.activeCurrencyConversionTab = ticker;
     this.loading = true;
     this.subscriptions.map( subscription => subscription.unsubscribe());
     this.coinsService.stopStream();
     this.router.navigate([`/coins/${ticker}/${this.currentPage}`]);
+  }
+
+  /**
+   * on click handler for when "next page" button is clicked
+   */
+  onNextPage() {
+    this.loading = true;
+    this.currentPage++;
+    // move these two lines to a helper method since they are written in 3 different places by now.
+    this.subscriptions.map( subscription => subscription.unsubscribe());
+    this.coinsService.stopStream();
+    this.router.navigate([`/coins/${this.activeCurrencyConversionTab}/${this.currentPage}`]);
+  }
+
+  /**
+   * on click handler for when "previous page" button is clicked
+   */
+  onPreviousPage() {
+    this.loading = true;
+    this.currentPage--;
+    this.subscriptions.map( subscription => subscription.unsubscribe());
+    this.coinsService.stopStream();
+    this.router.navigate([`/coins/${this.activeCurrencyConversionTab}/${this.currentPage}`]);
   }
 
   ngOnDestroy() {

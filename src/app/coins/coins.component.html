@@ -1,5 +1,5 @@
 <div class="wrapper">
-  <header>
+  <header class="header">
     <h1>Coins List</h1>
     <ul class="nav nav-tabs">
       <li *ngFor="let tab of conversionCurrencyTabs"
@@ -13,58 +13,69 @@
   </header>
   <div class="spinner-wrapper" *ngIf="loading">
       <mat-spinner></mat-spinner>
-  </div> 
-  <table class="coin-table table table-bordered table-hover">
-    <thead>
-      <tr>
-        <th class="row-number">#</th>
-        <th colspan="2">Coin</th>
-        <th class="price">Price</th>
-        <th class="volume">Vol 24h</th>
-        <th class="marketcap">Market Cap</th>
-        <th class="percent-change24h">% Change (24H)</th>
-      </tr>
-    </thead>
-    <tbody class="coin-table-body">
-        <tr *ngFor="let data of coinData; let i=index">
-            <td class="row-number">{{i + 1}}</td>
-            <td class="icon">
-              <img [src]="'https://www.cryptocompare.com' + data.CoinInfo.ImageUrl">
-            <td class="name">
-              <span class="full-name">{{data.CoinInfo.FullName}}</span>
-              <br>
-              <span class="ticker">{{data.CoinInfo.Name}}</span>
-            </td>
-            <td class="price">
-              <div class="price-value" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
-                  {{data.SocketData?.price}}
-              </div>
-            </td>
-            <td class="volume">
-              {{data.SocketData?.volume}}
-            </td>
-            <td class="marketcap" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
-              {{data.SocketData?.mcap}}
-            </td>
-            <td class="percent-change24h">
-              <div class="percent-change24h-value"
-                  [ngClass]="{'positive': data.SocketData?.changePercent > '0', 'negative': data.SocketData?.changePercent < '0' }">
-                  {{data.SocketData?.changePercent}}
-              </div>
-            </td>
-          </tr> 
-    </tbody>
-  </table>
-  <div class="coin-table-footer">
-    <div class="btn-streaming-status">
-      <button class="btn"
-              [ngClass]="{ 'btn-success': isStreaming, 'btn-danger': !isStreaming }"
-              (click)="onChangeStreamingStatus()">
-        <i class="fa m-right-sm"
-          [ngClass]="{ 'fa-toggle-off': !isStreaming, 'fa-toggle-on': isStreaming }">
-        </i>
-        <span>Live</span>
-      </button>
-    </div>
   </div>
+  <div class="col-md-12">
+    <div class="coin-pagination">
+      <div class="pull-right">
+        <a *ngIf="currentPage > 1"
+            (click)="onPreviousPage()"
+            class="btn btn-xs btn-previous-page">Previous Page</a>
+        <a (click)="onNextPage()"
+          class="btn btn-xs btn-next-page">Next Page</a>
+      </div>
+    </div> 
+    <table class="coin-table table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th class="row-number">#</th>
+          <th colspan="2">Coin</th>
+          <th class="price">Price</th>
+          <th class="volume">Vol 24h</th>
+          <th class="marketcap">Market Cap</th>
+          <th class="percent-change24h">% Change (24H)</th>
+        </tr>
+      </thead>
+      <tbody class="coin-table-body">
+          <tr *ngFor="let data of coinData; let i=index">
+              <td class="row-number">{{i + 1}}</td>
+              <td class="icon">
+                <img [src]="'https://www.cryptocompare.com' + data.CoinInfo.ImageUrl">
+              <td class="name">
+                <span class="full-name">{{data.CoinInfo.FullName}}</span>
+                <br>
+                <span class="ticker">{{data.CoinInfo.Name}}</span>
+              </td>
+              <td class="price">
+                <div class="price-value" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
+                    {{data.SocketData?.price}}
+                </div>
+              </td>
+              <td class="volume">
+                {{data.SocketData?.volume}}
+              </td>
+              <td class="marketcap" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
+                {{data.SocketData?.mcap}}
+              </td>
+              <td class="percent-change24h">
+                <div class="percent-change24h-value"
+                    [ngClass]="{'positive': data.SocketData?.changePercent > '0', 'negative': data.SocketData?.changePercent < '0' }">
+                    {{data.SocketData?.changePercent}}
+                </div>
+              </td>
+            </tr> 
+      </tbody>
+    </table>
+    <div class="coin-table-footer">
+      <div class="btn-streaming-status">
+        <button class="btn"
+                [ngClass]="{ 'btn-success': isStreaming, 'btn-danger': !isStreaming }"
+                (click)="onChangeStreamingStatus()">
+          <i class="fa m-right-sm"
+            [ngClass]="{ 'fa-toggle-off': !isStreaming, 'fa-toggle-on': isStreaming }">
+          </i>
+          <span>Live</span>
+        </button>
+      </div>
+    </div>
+  </div>    
 </div>

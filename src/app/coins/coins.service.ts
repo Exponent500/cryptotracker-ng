@@ -62,9 +62,10 @@ export class CoinsService {
      * Gets cryptocompare's "TopCoinsByTotalVolume" data.
      * @param conversionCurrency -  the conversion currency to convert the data into.
      * @param numberOfCoins - total number of coins to get data for.
+     * @param page - page of interest
      */
-    getTopCoinsByTotalVolume(conversionCurrency: string, numberOfCoins: number): Observable<TopCoinsByTotalVolumeResponse> {
-        return this.cryptoCompareDataService.getTopCoinsByTotalVolume(conversionCurrency, numberOfCoins);
+    getTopCoinsByTotalVolume(conversionCurrency: string, numberOfCoins: number, page: number): Observable<TopCoinsByTotalVolumeResponse> {
+        return this.cryptoCompareDataService.getTopCoinsByTotalVolume(conversionCurrency, numberOfCoins, page);
     }
 
      /**
