@@ -8,7 +8,7 @@ import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-
 
 @Injectable()
 export class CoinsByTotalVolumeResolver implements Resolve<TopCoinsByTotalVolumeResponse> {
-    numberOfCoins = 10;
+    numberOfCoins = 100;
 
     constructor(private cryptoCompareDataService: CryptoCompareDataService) {}
      resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<TopCoinsByTotalVolumeResponse> {
