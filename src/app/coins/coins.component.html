@@ -2,8 +2,8 @@
   <header>
     <h1>Coins List</h1>
     <ul class="nav nav-tabs">
-      <li *ngFor="let tab of currencyToTabs">
-        <a (click)="onChangeCurrencyTo(tab)">{{tab}}</a>
+      <li *ngFor="let tab of conversionCurrencyTabs">
+        <a (click)="onChangeConversionCurrency(tab)">{{tab}}</a>
       </li>
     </ul>
   </header>
@@ -22,7 +22,7 @@
       </tr>
     </thead>
     <tbody class="coin-table-body">
-        <tr *ngFor="let data of coinsDataToDisplay; let i=index">
+        <tr *ngFor="let data of coinData; let i=index">
             <td class="row-number">{{i + 1}}</td>
             <td class="icon">
               <img [src]="'https://www.cryptocompare.com' + data.CoinInfo.ImageUrl">

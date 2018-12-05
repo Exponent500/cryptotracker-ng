@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { CoinsService } from './coins.service';
-import { CoinData, CoinDataWithSocketData } from '../shared/cryptocompare/interfaces';
+import { CoinDataWithSocketData } from '../shared/cryptocompare/interfaces';
 
 @Component({
   selector: 'app-coins',
@@ -14,8 +14,8 @@ import { CoinData, CoinDataWithSocketData } from '../shared/cryptocompare/interf
 export class CoinsComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   getCoinDataSub: Subscription = new Subscription();
-  coinsDataToDisplay: CoinDataWithSocketData[] = [];
-  currencyToTabs: string[] = ['USD', 'BTC', 'ETH', 'EUR', 'GBP', 'JPY', 'KRW'];
+  coinData: CoinDataWithSocketData[] = [];
+  conversionCurrencyTabs: string[] = ['USD', 'BTC', 'ETH', 'EUR', 'GBP', 'JPY', 'KRW'];
   isStreaming = false;
   loading = true;
   currentPage = 1;
@@ -32,15 +32,19 @@ export class CoinsComponent implements OnInit, OnDestroy {
         this.getCoinDataSub = this.coinsService.getRealTimeCoinData(coinsDataSortedByTotalVolume)
           .subscribe(coinData => {
             this.loading = false;
-            this.coinsDataToDisplay = coinData;
+            this.coinData = coinData;
             this.isStreaming = this.coinsService.isStreaming;
           });
         this.subscriptions.push(this.getCoinDataSub);
       });
   }
 
-  // Click handler for when user clicks on one of the currencyTo tabs
-  onChangeCurrencyTo(ticker: string) {
+
+  /**
+   * Click handler for when conversion currency is changed.
+   * @param ticker -- ticker name of conversion currency
+   */
+  onChangeConversionCurrency(ticker: string) {
     this.loading = true;
     this.subscriptions.map( subscription => subscription.unsubscribe());
     this.coinsService.stopStream();
@@ -52,7 +56,10 @@ export class CoinsComponent implements OnInit, OnDestroy {
     this.coinsService.stopStream();
   }
 
-  // Click handler for when "Live" button is clicked. Should toggle between starting and stopping stream.
+  /**
+   * Click handler for when streaming status is changed via the "Live" button.
+   * Toggles between stopping and resuming stream.
+   */
   onChangeStreamingStatus() {
     this.isStreaming = !this.coinsService.isStreaming;
     this.isStreaming ?  this.coinsService.restartStream() : this.coinsService.stopStream();

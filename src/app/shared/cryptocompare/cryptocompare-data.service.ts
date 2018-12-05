@@ -3,11 +3,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { TopCoinsByTotalVolumeResponse, FullCoinTradingDataResponse } from './interfaces';
+import { TopCoinsByTotalVolumeResponse } from './interfaces';
 
 const BASE_URL = 'https://min-api.cryptocompare.com/data/';
 const TOP_COINS_BY_TOTAL_VOLUME_URL = `${BASE_URL}top/totalvol`;
-const FULL_DATA_FOR_COINS_URL = `${BASE_URL}pricemultifull`;
 
 @Injectable()
 export class CryptoCompareDataService {
@@ -15,17 +14,13 @@ export class CryptoCompareDataService {
     constructor(private httpClient: HttpClient) {}
 
     /**
-     * Fetches coin data for the numberOfCoins provided, sorted by volume and priced in the currencySymbol provided.
+     * Fetches top coins sorted by total volume, sorted by volume and priced in the currencySymbol provided.
+     * @param currencySymbol - the conversion currency of interest
+     * @param numberOfCoins - number of coins to get data for
      */
-    getTopCoinsByTotalVolume(currencySymbol: string, numberOfCoins: number): Observable<TopCoinsByTotalVolumeResponse> {
-        this.coinToCurrency = currencySymbol;
-        const params = new HttpParams().set('tsym', currencySymbol).set('limit', numberOfCoins.toString());
+    getTopCoinsByTotalVolume(conversionCurrency: string, numberOfCoins: number): Observable<TopCoinsByTotalVolumeResponse> {
+        this.coinToCurrency = conversionCurrency;
+        const params = new HttpParams().set('tsym', conversionCurrency).set('limit', numberOfCoins.toString());
         return this.httpClient.get<TopCoinsByTotalVolumeResponse>(TOP_COINS_BY_TOTAL_VOLUME_URL, { params: params });
-    }
-
-    getFullCoinTradingData(currencies: string[]): Observable<FullCoinTradingDataResponse> {
-        const fromCurrencySymbols = currencies.join(',');
-        const params = new HttpParams().set('fsyms', fromCurrencySymbols).set('tsyms', 'USD');
-        return this.httpClient.get<FullCoinTradingDataResponse>(FULL_DATA_FOR_COINS_URL, { params: params });
     }
 }

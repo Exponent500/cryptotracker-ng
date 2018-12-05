@@ -20,6 +20,7 @@ export class CryptocompareSocketService {
 
     /**
      * Add socket subscriptions of interest.
+     * @param subscriptions - subscriptions to add
      */
     addSubscriptions(subscriptions: string[]) {
         console.log(subscriptions);
@@ -58,9 +59,9 @@ export class CryptocompareSocketService {
         this.socket.emit('SubAdd', { subs: this.socketSubscriptions });
     }
 
-
     /**
      * Adds socket volume data to the appropriate currencyPair key within the master coinsSocketData object
+     * @param socketVolumeData - socket volume data to add.
      */
     private addFullVolumeDataToCurrentCoinSocketData (socketVolumeData: string) {
         const socketVolumeDataUnPacked = CCC.FULLVOLUME.unpack(socketVolumeData);
