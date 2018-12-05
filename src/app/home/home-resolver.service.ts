@@ -9,7 +9,7 @@ import { CryptoCompareDataService } from '../shared/cryptocompare/cryptocompare-
 @Injectable()
 export class CoinsByTotalVolumeResolverForHomePage implements Resolve<TopCoinsByTotalVolumeResponse> {
     numberOfCoins = 10;
-    page = 1;
+    page = 0;
     coinToCurrency = 'USD';
 
     constructor(private cryptoCompareDataService: CryptoCompareDataService) {}
