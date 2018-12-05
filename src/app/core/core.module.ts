@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 
-import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
 import { AppRoutingModule } from '../app-routing.module';
 import { CoinsService } from '../coins/coins.service';
@@ -10,7 +9,6 @@ import { CryptocompareSocketService } from '../shared/cryptocompare/cryptocompar
 
 @NgModule({
     declarations: [
-        HomeComponent,
         HeaderComponent,
         FooterComponent
     ],

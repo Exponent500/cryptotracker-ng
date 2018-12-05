@@ -1,0 +1,13 @@
+<div class="container">
+  <app-coin-table [coinData]="coinData"></app-coin-table>
+  <div class="btn-streaming-status">
+    <button class="btn"
+            [ngClass]="{ 'btn-success': isStreaming, 'btn-danger': !isStreaming }"
+            (click)="onChangeStreamingStatus()">
+      <i class="fa m-right-sm"
+        [ngClass]="{ 'fa-toggle-off': !isStreaming, 'fa-toggle-on': isStreaming }">
+      </i>
+      <span>Live</span>
+    </button>
+  </div>
+</div>

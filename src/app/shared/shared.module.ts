@@ -1,7 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { CoinTableComponent } from './coin-table/coin-table.component';
 
 @NgModule({
-    exports: [CommonModule]
+    declarations: [CoinTableComponent],
+    imports: [CommonModule],
+    exports: [CommonModule, CoinTableComponent]
 })
 export class SharedModule {}
