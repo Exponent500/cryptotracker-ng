@@ -129,3 +129,18 @@ mat-spinner {
     top: 300px;
     left: 50%;
 }
+
+.conversion-currency-tab {
+    cursor: pointer;
+
+    &.active {
+        cursor: none;
+    }
+
+    .conversion-currency-tab-link {
+
+        &.active {
+            font-weight: $font-weight-bold;
+        }
+    }
+}

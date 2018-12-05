@@ -2,8 +2,12 @@
   <header>
     <h1>Coins List</h1>
     <ul class="nav nav-tabs">
-      <li *ngFor="let tab of conversionCurrencyTabs">
-        <a (click)="onChangeConversionCurrency(tab)">{{tab}}</a>
+      <li *ngFor="let tab of conversionCurrencyTabs"
+          class="conversion-currency-tab"
+          [ngClass]="{'active': activeCurrencyConversionTab === tab}">
+        <a (click)="onChangeConversionCurrency(tab)"
+           class="conversion-currency-tab-link"
+           [ngClass]="{'active': activeCurrencyConversionTab === tab}">{{tab}}</a>
       </li>
     </ul>
   </header>

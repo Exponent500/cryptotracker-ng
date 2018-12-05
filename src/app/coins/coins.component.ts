@@ -16,6 +16,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
   getCoinDataSub: Subscription = new Subscription();
   coinData: CoinDataWithSocketData[] = [];
   conversionCurrencyTabs: string[] = ['USD', 'BTC', 'ETH', 'EUR', 'GBP', 'JPY', 'KRW'];
+  activeCurrencyConversionTab = 'USD';
   isStreaming = false;
   loading = true;
   currentPage = 1;
@@ -45,6 +46,10 @@ export class CoinsComponent implements OnInit, OnDestroy {
    * @param ticker -- ticker name of conversion currency
    */
   onChangeConversionCurrency(ticker: string) {
+    if (this.activeCurrencyConversionTab === ticker) {
+      return;
+    }
+    this.activeCurrencyConversionTab = ticker;
     this.loading = true;
     this.subscriptions.map( subscription => subscription.unsubscribe());
     this.coinsService.stopStream();
