@@ -11,10 +11,8 @@
       </li>
     </ul>
   </header>
-  <div class="spinner-wrapper" *ngIf="loading">
-      <mat-spinner></mat-spinner>
-  </div>
-  <div class="col-md-12">
+  <mat-spinner *ngIf="loading"></mat-spinner>
+  <div *ngIf="!loading" class="col-md-12">
     <div class="coin-pagination">
       <div class="pull-right">
         <a *ngIf="currentPage > 1"
