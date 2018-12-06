@@ -12,26 +12,30 @@
     </ul>
   </header>
   <mat-spinner *ngIf="loading"></mat-spinner>
-  <div *ngIf="!loading" class="col-md-12">
-    <div class="coin-pagination">
-      <div class="pull-right">
-        <a *ngIf="currentPage > 1"
-            (click)="onPreviousPage()"
-            class="btn btn-xs btn-previous-page">Previous Page</a>
-        <a (click)="onNextPage()"
-          class="btn btn-xs btn-next-page">Next Page</a>
+  <section *ngIf="!loading" class="col-md-12">
+    <header>
+      <div class="coin-pagination">
+        <div class="pull-right">
+          <a *ngIf="currentPage > 1"
+              (click)="onPreviousPage()"
+              class="btn btn-xs btn-previous-page">Previous Page</a>
+          <a (click)="onNextPage()"
+            class="btn btn-xs btn-next-page">Next Page</a>
+        </div>
       </div>
-    </div>
+    </header>
     <app-coin-table [coinData]="coinData"></app-coin-table>
-    <div class="btn-streaming-status">
-      <button class="btn"
-              [ngClass]="{ 'btn-success': isStreaming, 'btn-danger': !isStreaming }"
-              (click)="onChangeStreamingStatus()">
-        <i class="fa m-right-sm"
-          [ngClass]="{ 'fa-toggle-off': !isStreaming, 'fa-toggle-on': isStreaming }">
-        </i>
-        <span>Live</span>
-      </button>
-    </div>
-  </div>    
+    <footer class="coin-table-footer">
+      <div class="btn-streaming-status">
+        <button class="btn"
+                [ngClass]="{ 'btn-success': isStreaming, 'btn-danger': !isStreaming }"
+                (click)="onChangeStreamingStatus()">
+          <i class="fa m-right-sm"
+            [ngClass]="{ 'fa-toggle-off': !isStreaming, 'fa-toggle-on': isStreaming }">
+          </i>
+          <span>Live</span>
+        </button>
+      </div>
+    </footer>
+  </section>    
 </div>
