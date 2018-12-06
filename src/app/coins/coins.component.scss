@@ -36,20 +36,20 @@ mat-spinner {
 .btn-previous-page, .btn-next-page {
     cursor: pointer;
     text-decoration: none;
-    border: 1px solid #ececec;
+    border: 1px solid #ECECEC;
     padding-right: 14px;
     padding-left: 14px;
     color: #363D47;
-    background: #FFF;
+    background: $white-bgr;
 }
 
 .header {
     overflow: hidden;
-    background: #f4f9ff;
+    background: #F4F9FF;
 }
 
 .coin-table-footer {
-    background: #F3F8FF;
+    background: $coin-table-footer-bgr;
     padding: 10px;
 }
 

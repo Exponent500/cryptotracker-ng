@@ -1,3 +1,5 @@
+@import 'variables';
+
 .wrapper {
     position: relative;
     margin-left: -15px;
@@ -11,14 +13,14 @@ mat-spinner {
 }
 
 .btn-view-all-coins {
-    background: #FFF;
+    background: $white-bgr;
     border: 1px solid #ECECEC;
     color: #363D47;
 }
 
 .coin-table-footer {
     position: relative;
-    background: #F3F8FF;
+    background: $coin-table-footer-bgr;
     text-align: center;
     padding: 10px;
 }
