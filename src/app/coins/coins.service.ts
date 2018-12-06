@@ -111,12 +111,13 @@ export class CoinsService {
                 return (key === (datum.ConversionInfo.CurrencyFrom + datum.ConversionInfo.CurrencyTo));
             });
             if (index !== -1) {
+                const coinSupply = coinData[index].ConversionInfo.Supply;
                 const socketDatum: SocketData = {
-                    price: CCC.convertValueToDisplay(tsym, price),
+                    price: price ? CCC.convertValueToDisplay(tsym, price) : '-',
                     volume: socketData[key].FULLVOLUMETO ?
                             socketData[key].FULLVOLUMETO :
                             CCC.convertValueToDisplay(tsym, socketData[key].FULLVOLUMEFROM * price, 'short'),
-                    mcap: CCC.convertValueToDisplay(tsym, price * coinData[index].ConversionInfo.Supply, 'short'),
+                    mcap: coinSupply ? CCC.convertValueToDisplay(tsym, price * coinSupply, 'short') : '-',
                     changePercent: socketData[key].CHANGE24HOURPCT,
                     flags: socketData[key].FLAGS
                 };

@@ -109,9 +109,10 @@ export class CryptocompareSocketService {
         // with the currently selected conversion currency, but instead has a BTC or ETH pair.
         // For example ZEC may only have a ZECBTC or ZECETH pair, but NOT a ZECJPY pair. In this case we can multiply the ZECBTC pair
         // by the BTCPJY data to get our ZECJPY data.
-        if (socketDataCurrencyPair === `BTC${currencyToConvertToTicker}`) {
+
+        if (socketDataCurrencyPair === `BTC${currencyToConvertToTicker}` && socketDataPrice) {
             this.BTCPriceInConversionCurrency = socketDataPrice;
-        } else if (socketDataCurrencyPair === `ETH${currencyToConvertToTicker}`) {
+        } else if (socketDataCurrencyPair === `ETH${currencyToConvertToTicker}` && socketDataPrice) {
             this.ETHPriceInConversionCurrency = socketDataPrice;
         }
 
@@ -133,7 +134,7 @@ export class CryptocompareSocketService {
      * @param hasDirectPair -- whether or not the currency pair has a direct pair with the currency we are converting to
      */
     private mapCURRENTAGGDataToCCCSocketModified(socketCURRENTAGGData: any, currencyPair: string, hasDirectPair: boolean) {
-        let BTCorETHPriceInConversionCurrency;
+        let BTCorETHPriceInConversionCurrency: number;
         const socketDataPrice: number = socketCURRENTAGGData['PRICE'];
         const socketDataCurrencyToTicker: string = socketCURRENTAGGData['TOSYMBOL'];
         const socketDataCurrencyFromTicker: string = socketCURRENTAGGData['FROMSYMBOL'];
@@ -154,9 +155,9 @@ export class CryptocompareSocketService {
             return;
         }
 
-        if (socketDataCurrencyToTicker === 'BTC') {
+        if (!hasDirectPair && socketDataCurrencyToTicker === 'BTC') {
             BTCorETHPriceInConversionCurrency = this.BTCPriceInConversionCurrency;
-        } else if (socketDataCurrencyToTicker === 'ETH') {
+        } else if (!hasDirectPair && socketDataCurrencyToTicker === 'ETH') {
             BTCorETHPriceInConversionCurrency = this.ETHPriceInConversionCurrency;
         }
 
