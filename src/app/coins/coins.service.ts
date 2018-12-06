@@ -8,7 +8,6 @@ import {
     CoinData,
     SocketData,
     CCCSocketDataModified,
-    TopCoinsByTotalVolumeResponse,
     CoinDataWithSocketData } from '../shared/cryptocompare/interfaces';
 import { CryptocompareSocketService } from '../shared/cryptocompare/cryptocompare-socket.service';
 import { CCC } from '../shared/cryptocompare/cryptocompare-socket.utilities';
@@ -20,24 +19,53 @@ export class CoinsService {
     constructor(private cryptoCompareDataService: CryptoCompareDataService,
                 private cryptocompareSocketService: CryptocompareSocketService) {}
 
-     /**
-      * Gets real-time coin data in a format that a consumer can display on the view.
-      * @param topCoinsByTotalVolume - coin data sorted by total volume
-      */
+    /**
+     * Gets real-time coin data in a format that a consumer can display on the view.
+     * @param topCoinsByTotalVolume - coin data sorted by total volume
+     */
     getRealTimeCoinData(topCoinsByTotalVolume: CoinData[]): Observable<CoinDataWithSocketData[]> {
-        const cryptocompareSubscriptionsToAdd: string[] = this.generateCryptocompareSubscriptions(topCoinsByTotalVolume);
-        this.addSocketSubscriptions(cryptocompareSubscriptionsToAdd);
-        return this.subscribeToSocket()
+        const cryptocompareSubscriptionsToAdd: string[] = this.generateCCSocketSubscriptions(topCoinsByTotalVolume);
+        this.addCCSocketSubscriptions(cryptocompareSubscriptionsToAdd);
+        return this.subscribeToCCSocket()
             .pipe(
-                map(socketData => this.addSocketDataToCoinData(socketData, topCoinsByTotalVolume))
+                map(socketData => this.addCCSocketDataToCoinData(socketData, topCoinsByTotalVolume))
             );
     }
 
-     /**
-      * Generates cryptocompare socket subscriptions of interest based on the provided topCoinsByTotalVolume data.
-      * @param topCoinsByTotalVolume - coin data sorted by total volume
-      */
-    private generateCryptocompareSubscriptions(topCoinsByTotalVolume: CoinData[]): string[] {
+    // Unsubscribes from the cryptocompare socket.
+    stopStream() {
+        this.isStreaming = false;
+        this.cryptocompareSocketService.unSubscribe();
+    }
+
+    // Restarts a stream that was stopped.
+    restartStream() {
+        this.isStreaming = true;
+        this.cryptocompareSocketService.reSubscribe();
+    }
+
+    /**
+     * Adds crypto compare socket subscriptions of interest to the crypto compare socket service.
+     * @param subscriptions - subscriptions to add
+     */
+    private addCCSocketSubscriptions(subscriptions: string[]) {
+        this.cryptocompareSocketService.addSubscriptions(subscriptions);
+    }
+
+    /**
+     * Subscribes to cryptocompare's socket.io server.
+     * You should make sure you add subscriptions of interest before subscribing, otherwise no data will be emitted.
+     */
+    private subscribeToCCSocket(): Observable<CCCSocketDataModified> {
+        this.isStreaming = true;
+        return this.cryptocompareSocketService.onNewMessage();
+    }
+
+    /**
+     * Generates cryptocompare socket subscriptions of interest based on the provided topCoinsByTotalVolume data.
+     * @param topCoinsByTotalVolume - coin data sorted by total volume
+     */
+    private generateCCSocketSubscriptions(topCoinsByTotalVolume: CoinData[]): string[] {
         const cryptocompareSubscriptionsToAdd = [];
         topCoinsByTotalVolume.forEach( item => {
             const currencyFrom: string = item.ConversionInfo.CurrencyFrom;
@@ -59,50 +87,11 @@ export class CoinsService {
     }
 
     /**
-     * Gets cryptocompare's "TopCoinsByTotalVolume" data.
-     * @param conversionCurrency -  the conversion currency to convert the data into.
-     * @param numberOfCoins - total number of coins to get data for.
-     * @param page - page of interest
-     */
-    getTopCoinsByTotalVolume(conversionCurrency: string, numberOfCoins: number, page: number): Observable<TopCoinsByTotalVolumeResponse> {
-        return this.cryptoCompareDataService.getTopCoinsByTotalVolume(conversionCurrency, numberOfCoins, page);
-    }
-
-     /**
-      * Adds crypto compare socket subscriptions of interest to the crypto compare socket service.
-      * @param subscriptions - subscriptions to add
-      */
-    addSocketSubscriptions(subscriptions: string[]) {
-        this.cryptocompareSocketService.addSubscriptions(subscriptions);
-    }
-
-    /**
-     * Subscribes to cryptocompare's socket.io server.
-     * You should make sure you add subscriptions of interest before subscribing, otherwise no data will be emitted.
-     */
-    subscribeToSocket(): Observable<CCCSocketDataModified> {
-        this.isStreaming = true;
-        return this.cryptocompareSocketService.onNewMessage();
-    }
-
-    // Unsubscribes from the cryptocompare socket.
-    stopStream() {
-        this.isStreaming = false;
-        this.cryptocompareSocketService.unSubscribe();
-    }
-
-    // Restarts a stream that was stopped.
-    restartStream() {
-        this.isStreaming = true;
-        this.cryptocompareSocketService.reSubscribe();
-    }
-
-    /**
      * Takes cryptocompare socket data and adds it to the appropriate key within the master coin data.
      * @param socketData -socketData to add.
      * @param coinData -master coin data to add socket data to.
      */
-    private addSocketDataToCoinData(socketData: CCCSocketDataModified, coinData: CoinData[]): CoinDataWithSocketData[] {
+    private addCCSocketDataToCoinData(socketData: CCCSocketDataModified, coinData: CoinData[]): CoinDataWithSocketData[] {
         const keys = Object.keys(socketData);
         const tsym = CCC.STATIC.CURRENCY.getSymbol(this.cryptoCompareDataService.coinToCurrency);
         keys.forEach( key => {
