@@ -93,7 +93,7 @@ export class CoinsService {
      */
     private addCCSocketDataToCoinData(socketData: CCCSocketDataModified, coinData: CoinData[]): CoinDataWithSocketData[] {
         const keys = Object.keys(socketData);
-        const tsym = CCC.STATIC.CURRENCY.getSymbol(this.cryptoCompareDataService.coinToCurrency);
+        const tsym = CCC.STATIC.CURRENCY.getSymbol(this.cryptoCompareDataService.conversionCurrency);
         keys.forEach( key => {
             const price = socketData[key].PRICE;
             const index = coinData.findIndex( datum => {

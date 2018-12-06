@@ -66,9 +66,9 @@ export class CryptocompareSocketService {
     private addFullVolumeDataToCurrentCoinSocketData (socketVolumeData: string) {
         const socketVolumeDataUnPacked = CCC.FULLVOLUME.unpack(socketVolumeData);
         const socketDataCurrencyFromTicker = socketVolumeDataUnPacked['SYMBOL'];
-        const currencyToConvertToTicker = this.cryptocompareDataService.coinToCurrency;
-        const currencyToConvertToSymbol = CCC.STATIC.CURRENCY.getSymbol(currencyToConvertToTicker);
-        const currencyPair = socketDataCurrencyFromTicker + currencyToConvertToTicker;
+        const conversionCurrencyTicker = this.cryptocompareDataService.conversionCurrency;
+        const conversionCurrencySymbol = CCC.STATIC.CURRENCY.getSymbol(conversionCurrencyTicker);
+        const currencyPair = socketDataCurrencyFromTicker + conversionCurrencyTicker;
 
         if (!this.coinsSocketData.hasOwnProperty(currencyPair)) {
             this.coinsSocketData[currencyPair] = {};
@@ -78,7 +78,7 @@ export class CryptocompareSocketService {
 
         if (currencyPair === 'BTCBTC') {
             this.coinsSocketData[currencyPair]['FULLVOLUMETO'] =
-                CCC.convertValueToDisplay(currencyToConvertToSymbol, this.coinsSocketData[currencyPair]['FULLVOLUMEFROM'], 'short');
+                CCC.convertValueToDisplay(conversionCurrencySymbol, this.coinsSocketData[currencyPair]['FULLVOLUMEFROM'], 'short');
             return;
         }
 
@@ -87,7 +87,7 @@ export class CryptocompareSocketService {
                 (this.coinsSocketData[currencyPair]['FULLVOLUMEFROM'] - this.coinsSocketData[currencyPair]['VOLUME24HOUR']) *
                 this.coinsSocketData[currencyPair]['PRICE'] ) + this.coinsSocketData[currencyPair]['VOLUME24HOURTO'];
             this.coinsSocketData[currencyPair]['FULLVOLUMETO'] =
-                CCC.convertValueToDisplay(currencyToConvertToSymbol, fullVolumeTo, 'short');
+                CCC.convertValueToDisplay(conversionCurrencySymbol, fullVolumeTo, 'short');
         }
     }
 
@@ -97,7 +97,7 @@ export class CryptocompareSocketService {
      */
     private handleCURRENTAGGSocketData(socketCURRENTAGGDataRAW: string): CCCSocketDataModified {
         console.log(socketCURRENTAGGDataRAW);
-        const currencyToConvertToTicker = this.cryptocompareDataService.coinToCurrency;
+        const conversionCurrencyTicker = this.cryptocompareDataService.conversionCurrency;
         const socketCURRENTAGGDataUnPacked = CCC.CURRENT.unpack(socketCURRENTAGGDataRAW);
         const socketDataCurrencyFromTicker: string = socketCURRENTAGGDataUnPacked['FROMSYMBOL'];
         const socketDataCurrencyToTicker: string = socketCURRENTAGGDataUnPacked['TOSYMBOL'];
@@ -110,15 +110,15 @@ export class CryptocompareSocketService {
         // For example ZEC may only have a ZECBTC or ZECETH pair, but NOT a ZECJPY pair. In this case we can multiply the ZECBTC pair
         // by the BTCPJY data to get our ZECJPY data.
 
-        if (socketDataCurrencyPair === `BTC${currencyToConvertToTicker}` && socketDataPrice) {
+        if (socketDataCurrencyPair === `BTC${conversionCurrencyTicker}` && socketDataPrice) {
             this.BTCPriceInConversionCurrency = socketDataPrice;
-        } else if (socketDataCurrencyPair === `ETH${currencyToConvertToTicker}` && socketDataPrice) {
+        } else if (socketDataCurrencyPair === `ETH${conversionCurrencyTicker}` && socketDataPrice) {
             this.ETHPriceInConversionCurrency = socketDataPrice;
         }
 
         // Received socket data for a currency pair that is NOT a direct pair with the currency we are looking to convert to.
-        if (socketDataCurrencyToTicker !== currencyToConvertToTicker) {
-            const currencyPair = socketDataCurrencyFromTicker + currencyToConvertToTicker;
+        if (socketDataCurrencyToTicker !== conversionCurrencyTicker) {
+            const currencyPair = socketDataCurrencyFromTicker + conversionCurrencyTicker;
             this.mapCURRENTAGGDataToCCCSocketModified(socketCURRENTAGGDataUnPacked, currencyPair, false);
             return this.coinsSocketData;
         }
