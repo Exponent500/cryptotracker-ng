@@ -39,7 +39,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
         }
         this.getCoinDataSub = this.coinsService.getRealTimeCoinData(coinsDataSortedByTotalVolume)
           .subscribe(coinData => {
-            this.loading = false;
+            coinData[0].SocketData ? this.loading = false : this.loading = true;
             this.coinData = coinData;
             this.isStreaming = this.coinsService.isStreaming;
           });
