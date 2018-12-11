@@ -28,8 +28,15 @@ export class CoinsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.route.data.subscribe(
       data => {
-        const coinsDataSortedByTotalVolume = data['coinsByTotalVolume'].Data;
+        const coinsDataSortedByTotalVolume: CoinDataWithSocketData[] = data['coinsByTotalVolume'].Data;
+        // need to assign an empty object to SocketData so that later on we can set it's properties.
+        // Need to find a better way, and place for this.
+        coinsDataSortedByTotalVolume.map( item => item.SocketData = {});
+        const conversionCurrency = coinsDataSortedByTotalVolume[0].ConversionInfo.CurrencyTo;
         this.coinsService.coinsDataToDisplay = coinsDataSortedByTotalVolume;
+        if (conversionCurrency === 'BTC' || conversionCurrency === 'ETH') {
+          this.coinsService.prePopulateCCSocketData(conversionCurrency);
+        }
         this.getCoinDataSub = this.coinsService.getRealTimeCoinData(coinsDataSortedByTotalVolume)
           .subscribe(coinData => {
             this.loading = false;

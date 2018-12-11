@@ -21,11 +21,11 @@
             </td>
             <td class="price">
                 <div class="price-value" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
-                    {{data.SocketData?.price}}
+                    {{data.SocketData?.priceDisplay}}
                 </div>
             </td>
             <td class="volume">
-                {{data.SocketData?.volume}}
+                {{data.SocketData?.fullVolume24Hour}}
             </td>
             <td class="marketcap" [ngClass]="{'increase': data.SocketData?.flags === '1', 'decrease': data.SocketData?.flags === '2'}">
                 {{data.SocketData?.mcap}}

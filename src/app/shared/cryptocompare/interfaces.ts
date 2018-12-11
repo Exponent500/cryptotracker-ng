@@ -30,11 +30,16 @@ interface ConversionInfo {
 }
 
 export interface SocketData {
-    price: number;
-    volume: number;
-    mcap: number;
-    changePercent: string;
-    flags: string;
+    price?: number;
+    priceDisplay?: number;
+    priceConversionCurrency?: number;
+    fullVolume24Hour?: number;
+    volume24Hour?: number;
+    volume24HourTo?: number;
+    mcap?: number;
+    changePercent?: string;
+    open24Hour?: number;
+    flags?: string;
 }
 
 export interface CoinData {

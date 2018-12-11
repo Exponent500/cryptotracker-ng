@@ -10,7 +10,6 @@ const TOP_COINS_BY_TOTAL_VOLUME_URL = `${BASE_URL}top/totalvol`;
 
 @Injectable()
 export class CryptoCompareDataService {
-    conversionCurrency = '';
     constructor(private httpClient: HttpClient) {}
 
     /**
@@ -20,7 +19,6 @@ export class CryptoCompareDataService {
      * @param page - page of results
      */
     getTopCoinsByTotalVolume(conversionCurrency: string, numberOfCoins: number, page: number): Observable<TopCoinsByTotalVolumeResponse> {
-        this.conversionCurrency = conversionCurrency;
         const params = new HttpParams().set('tsym', conversionCurrency).set('limit', numberOfCoins.toString()).set('page', page.toString());
         return this.httpClient.get<TopCoinsByTotalVolumeResponse>(TOP_COINS_BY_TOTAL_VOLUME_URL, { params: params });
     }
