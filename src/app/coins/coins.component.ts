@@ -45,6 +45,13 @@ export class CoinsComponent implements OnInit, OnDestroy {
           });
         this.subscriptions.push(this.getCoinDataSub);
       });
+
+      this.route.params.subscribe(
+        params => {
+          this.activeCurrencyConversionTab = params['conversionCurrency'];
+          this.currentPage = params['page'];
+        }
+      );
   }
 
 
