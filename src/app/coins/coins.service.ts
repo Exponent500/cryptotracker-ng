@@ -109,135 +109,95 @@ export class CoinsService {
      * @param socketCurrentAGGData -- RAW CURRENTAGG socket data
      */
     private handleCURRENTAGGSocketData(socketCURRENTAGGDataRAW: string) {
-        console.log(socketCURRENTAGGDataRAW);
         const socketCURRENTAGGDataUnPacked = CCC.CURRENT.unpack(socketCURRENTAGGDataRAW);
         const socketDataCurrencyFromTicker: string = socketCURRENTAGGDataUnPacked['FROMSYMBOL'];
         const socketDataCurrencyToTicker: string = socketCURRENTAGGDataUnPacked['TOSYMBOL'];
         const socketDataPrice: number = socketCURRENTAGGDataUnPacked['PRICE'];
         const socketDataMarket = socketCURRENTAGGDataUnPacked['MARKET'];
         const socketDataType = socketCURRENTAGGDataUnPacked['TYPE'];
-        const socketDataOpen24Hour = socketCURRENTAGGDataUnPacked['OPEN24HOUR'];
-        const volume24Hour = socketCURRENTAGGDataUnPacked['VOLUME24HOUR'];
-        const volume24HourTo = socketCURRENTAGGDataUnPacked['VOLUME24HOURTO'];
-        const flags = socketCURRENTAGGDataUnPacked['FLAGS'];
         const socketSub = `${socketDataType}~${socketDataMarket}~${socketDataCurrencyFromTicker}~${socketDataCurrencyToTicker}`;
 
-        this.coinsDataToDisplay.forEach( item => {
-            const currencyToSymbol = CCC.STATIC.CURRENCY.getSymbol(item.ConversionInfo.CurrencyTo);
-            const coinSupply = item.ConversionInfo.Supply;
-            if (item.ConversionInfo.SubsNeeded[0] === socketSub) {
-                switch (item.ConversionInfo.Conversion) {
+        this.coinsDataToDisplay.forEach( coinDatum => {
+            if (coinDatum.ConversionInfo.SubsNeeded[0] === socketSub) {
+                switch (coinDatum.ConversionInfo.Conversion) {
                     case 'invert_divide':
                         if (socketDataPrice) {
-                            item.SocketData.priceConversionCurrency = socketDataPrice;
+                            coinDatum.SocketData.priceConversionCurrency = socketDataPrice;
                         }
                         break;
                     case 'direct':
-                        if (socketDataPrice) {
-                            item.SocketData.priceDisplay = CCC.convertValueToDisplay(currencyToSymbol, socketDataPrice);
-                            item.SocketData.price = socketDataPrice;
-                            item.SocketData.mcap = CCC.convertValueToDisplay(currencyToSymbol, socketDataPrice * coinSupply, 'short');
-                        }
-                        if (socketDataOpen24Hour) {
-                            item.SocketData.open24Hour = socketDataOpen24Hour;
-                        }
-                        if (item.SocketData.price && item.SocketData.open24Hour) {
-                            item.SocketData.changePercent =
-                                ((item.SocketData.price - item.SocketData.open24Hour) / item.SocketData.open24Hour * 100).toFixed(2) + '%';
-                        }
-                        item.SocketData.volume24Hour = volume24Hour;
-                        item.SocketData.volume24HourTo = volume24HourTo;
-                        item.SocketData.flags = flags;
+                        this.addCCSocketDataToCoinData(socketCURRENTAGGDataUnPacked, coinDatum);
                         break;
                     case 'invert':
-                        if (socketDataPrice) {
-                            const socketDataPriceConverted = 1 / socketDataPrice;
-                            item.SocketData.priceDisplay = CCC.convertValueToDisplay(currencyToSymbol, socketDataPriceConverted);
-                            item.SocketData.price = socketDataPriceConverted;
-                            item.SocketData.mcap = CCC.convertValueToDisplay(currencyToSymbol, socketDataPriceConverted * coinSupply, 'short');
-                        }
-                        if (socketDataOpen24Hour) {
-                            const socketDataOpen24HourConverted = 1 / socketDataOpen24Hour;
-                            item.SocketData.open24Hour = socketDataOpen24HourConverted;
-                        }
-                        if (item.SocketData.price && item.SocketData.open24Hour) {
-                            item.SocketData.changePercent =
-                                ((item.SocketData.price - item.SocketData.open24Hour) / item.SocketData.open24Hour * 100).toFixed(2) + '%';
-                        }
-                        item.SocketData.volume24Hour = volume24Hour;
-                        item.SocketData.volume24HourTo = volume24HourTo;
-                        item.SocketData.flags = flags;
+                        socketCURRENTAGGDataUnPacked['PRICE'] = 1 / socketCURRENTAGGDataUnPacked['PRICE'];
+                        socketCURRENTAGGDataUnPacked['OPEN24HOUR'] = 1 / socketCURRENTAGGDataUnPacked['OPEN24HOUR'];
+                        this.addCCSocketDataToCoinData(socketCURRENTAGGDataUnPacked, coinDatum);
                         break;
                     case 'multiply':
-                        if (socketDataPrice) {
-                            const socketDataPriceConverted = socketDataPrice * item.SocketData.priceConversionCurrency;
-                            item.SocketData.priceDisplay = CCC.convertValueToDisplay(currencyToSymbol, socketDataPriceConverted);
-                            item.SocketData.price = socketDataPriceConverted;
-                            item.SocketData.mcap = CCC.convertValueToDisplay(currencyToSymbol, socketDataPriceConverted * coinSupply, 'short');
-                        }
-                        if (socketDataOpen24Hour) {
-                            const socketDataOpen24HourConverted = socketDataOpen24Hour * item.SocketData.priceConversionCurrency;
-                            item.SocketData.open24Hour = socketDataOpen24HourConverted;
-                        }
-                        if (item.SocketData.price && item.SocketData.open24Hour) {
-                            item.SocketData.changePercent =
-                                ((item.SocketData.price - item.SocketData.open24Hour) / item.SocketData.open24Hour * 100).toFixed(2) + '%';
-                        }
-                        item.SocketData.volume24Hour = volume24Hour;
-                        item.SocketData.volume24HourTo = volume24HourTo;
-                        item.SocketData.flags = flags;
+                        socketCURRENTAGGDataUnPacked['PRICE'] =
+                            socketCURRENTAGGDataUnPacked['PRICE'] * coinDatum.SocketData.priceConversionCurrency;
+                        socketCURRENTAGGDataUnPacked['OPEN24HOUR'] =
+                            socketCURRENTAGGDataUnPacked['OPEN24HOUR'] * coinDatum.SocketData.priceConversionCurrency;
+                        this.addCCSocketDataToCoinData(socketCURRENTAGGDataUnPacked, coinDatum);
                         break;
                     case 'divide':
-                        if (socketDataPrice) {
-                            const socketDataPriceConverted = socketDataPrice / item.SocketData.priceConversionCurrency;
-                            item.SocketData.priceDisplay = CCC.convertValueToDisplay(currencyToSymbol, socketDataPriceConverted);
-                            item.SocketData.price = socketDataPriceConverted;
-                            item.SocketData.mcap = CCC.convertValueToDisplay(currencyToSymbol, socketDataPriceConverted * coinSupply, 'short');
-                        }
-                        if (socketDataOpen24Hour) {
-                            const socketDataOpen24HourConverted = socketDataOpen24Hour / item.SocketData.priceConversionCurrency;
-                            item.SocketData.open24Hour = socketDataOpen24HourConverted;
-                        }
-                        if (item.SocketData.price && item.SocketData.open24Hour) {
-                            item.SocketData.changePercent =
-                                ((item.SocketData.price - item.SocketData.open24Hour) / item.SocketData.open24Hour * 100).toFixed(2) + '%';
-                        }
-                        item.SocketData.volume24Hour = volume24Hour;
-                        item.SocketData.volume24HourTo = volume24HourTo;
-                        item.SocketData.flags = flags;
+                        socketCURRENTAGGDataUnPacked['PRICE'] =
+                            socketCURRENTAGGDataUnPacked['PRICE'] / coinDatum.SocketData.priceConversionCurrency;
+                        socketCURRENTAGGDataUnPacked['OPEN24HOUR'] =
+                            socketCURRENTAGGDataUnPacked['OPEN24HOUR'] / coinDatum.SocketData.priceConversionCurrency;
+                        this.addCCSocketDataToCoinData(socketCURRENTAGGDataUnPacked, coinDatum);
                         break;
                 }
             }
-            if (item.ConversionInfo.SubsNeeded[1] === socketSub) {
-                switch (item.ConversionInfo.Conversion) {
+            if (coinDatum.ConversionInfo.SubsNeeded[1] === socketSub) {
+                switch (coinDatum.ConversionInfo.Conversion) {
                     case 'multiply':
                     case 'divide':
                         if (socketDataPrice) {
-                            item.SocketData.priceConversionCurrency = socketDataPrice;
+                            coinDatum.SocketData.priceConversionCurrency = socketDataPrice;
                         }
                         break;
                     case 'invert_divide':
-                        if (socketDataPrice) {
-                            const socketDataPriceConverted =  item.SocketData.priceConversionCurrency / socketDataPrice;
-                            item.SocketData.priceDisplay = CCC.convertValueToDisplay(currencyToSymbol, socketDataPriceConverted);
-                            item.SocketData.price = socketDataPriceConverted;
-                            item.SocketData.mcap = CCC.convertValueToDisplay(currencyToSymbol, socketDataPriceConverted * coinSupply, 'short');
-                        }
-                        if (socketDataOpen24Hour) {
-                            const socketDataOpen24HourConverted =  item.SocketData.priceConversionCurrency / socketDataOpen24Hour;
-                            item.SocketData.open24Hour = socketDataOpen24HourConverted;
-                        }
-                        if (item.SocketData.price && item.SocketData.open24Hour) {
-                            item.SocketData.changePercent =
-                                ((item.SocketData.price - item.SocketData.open24Hour) / item.SocketData.open24Hour * 100).toFixed(2) + '%';
-                        }
-                        item.SocketData.volume24Hour = volume24Hour;
-                        item.SocketData.volume24HourTo = volume24HourTo;
-                        item.SocketData.flags = flags;
+                        socketCURRENTAGGDataUnPacked['PRICE'] =
+                            coinDatum.SocketData.priceConversionCurrency / socketCURRENTAGGDataUnPacked['PRICE'];
+                        socketCURRENTAGGDataUnPacked['OPEN24HOUR'] =
+                            coinDatum.SocketData.priceConversionCurrency / socketCURRENTAGGDataUnPacked['OPEN24HOUR'];
+                        this.addCCSocketDataToCoinData(socketCURRENTAGGDataUnPacked, coinDatum);
                         break;
                 }
             }
         });
+    }
+
+    /**
+     * Adds socketData to coinData
+     * @param socketData - socketData to add
+     * @param coinDatum  - coinDatum to add socketData to
+     */
+    private addCCSocketDataToCoinData(socketData, coinDatum) {
+        const currencyToSymbol = CCC.STATIC.CURRENCY.getSymbol(coinDatum.ConversionInfo.CurrencyTo);
+        const coinSupply = coinDatum.ConversionInfo.Supply;
+        const socketDataPrice: number = socketData['PRICE'];
+        const socketDataOpen24Hour = socketData['OPEN24HOUR'];
+        const socketDataVolume24Hour = socketData['VOLUME24HOUR'];
+        const socketDataVolume24HourTo = socketData['VOLUME24HOURTO'];
+        const socketDataFlags = socketData['FLAGS'];
+
+        if (socketDataPrice) {
+            coinDatum.SocketData.priceDisplay = CCC.convertValueToDisplay(currencyToSymbol, socketDataPrice);
+            coinDatum.SocketData.price = socketDataPrice;
+            coinDatum.SocketData.mcap = CCC.convertValueToDisplay(currencyToSymbol, socketDataPrice * coinSupply, 'short');
+        }
+        if (socketDataOpen24Hour) {
+            coinDatum.SocketData.open24Hour = socketDataOpen24Hour;
+        }
+        if (coinDatum.SocketData.price && coinDatum.SocketData.open24Hour) {
+            coinDatum.SocketData.changePercent =
+                ((coinDatum.SocketData.price - coinDatum.SocketData.open24Hour) / coinDatum.SocketData.open24Hour * 100).toFixed(2) + '%';
+        }
+        coinDatum.SocketData.volume24Hour = socketDataVolume24Hour;
+        coinDatum.SocketData.volume24HourTo = socketDataVolume24HourTo;
+        coinDatum.SocketData.flags = socketDataFlags;
     }
 
     /**
