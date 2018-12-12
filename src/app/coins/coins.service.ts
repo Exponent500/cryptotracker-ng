@@ -31,7 +31,8 @@ export class CoinsService {
         const mcap = CCC.convertValueToDisplay(currencySymbol, supply, 'short');
         const socketDatum: SocketData = {
             price: price,
-            changePercent: '0.0%',
+            changePercent: 0,
+            changePercentDisplay: '0.0%',
             mcap: mcap
         };
         coinData.SocketData = socketDatum;
@@ -192,8 +193,10 @@ export class CoinsService {
             coinDatum.SocketData.open24Hour = socketDataOpen24Hour;
         }
         if (coinDatum.SocketData.price && coinDatum.SocketData.open24Hour) {
-            coinDatum.SocketData.changePercent =
-                ((coinDatum.SocketData.price - coinDatum.SocketData.open24Hour) / coinDatum.SocketData.open24Hour * 100).toFixed(2) + '%';
+            const changePercent =
+                ((coinDatum.SocketData.price - coinDatum.SocketData.open24Hour) / coinDatum.SocketData.open24Hour * 100).toFixed(2);
+            coinDatum.SocketData.changePercent = changePercent;
+            coinDatum.SocketData.changePercentDisplay = `${changePercent}%`;
         }
         coinDatum.SocketData.volume24Hour = socketDataVolume24Hour;
         coinDatum.SocketData.volume24HourTo = socketDataVolume24HourTo;

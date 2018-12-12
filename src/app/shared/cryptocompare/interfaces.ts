@@ -37,7 +37,8 @@ export interface SocketData {
     volume24Hour?: number;
     volume24HourTo?: number;
     mcap?: number;
-    changePercent?: string;
+    changePercent?: number;
+    changePercentDisplay?: string;
     open24Hour?: number;
     flags?: string;
 }

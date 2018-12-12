@@ -32,8 +32,8 @@
             </td>
             <td class="percent-change24h">
                 <div class="percent-change24h-value"
-                    [ngClass]="{'positive': data.SocketData?.changePercent > '0', 'negative': data.SocketData?.changePercent < '0' }">
-                    {{data.SocketData?.changePercent}}
+                    [ngClass]="{'positive': data.SocketData?.changePercent > 0, 'negative': data.SocketData?.changePercent < 0 }">
+                    {{data.SocketData?.changePercentDisplay}}
                 </div>
             </td>
             </tr> 
