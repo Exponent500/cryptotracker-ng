@@ -11,7 +11,7 @@
     </thead>
     <tbody class="coin-table-body">
         <tr *ngFor="let data of coinData; let i=index">
-            <td class="row-number">{{i + 1}}</td>
+            <td class="row-number">{{ (i + 1) + (page * 100) }}</td>
             <td class="icon">
                 <img [src]="'https://www.cryptocompare.com' + data.CoinInfo.ImageUrl">
             <td class="name">

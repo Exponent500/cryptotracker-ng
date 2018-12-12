@@ -19,7 +19,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
   activeCurrencyConversionTab = 'USD';
   isStreaming = false;
   loading = true;
-  currentPage = 1;
+  currentPage = 0;
 
   constructor(private coinsService: CoinsService,
               private route: ActivatedRoute,
@@ -49,7 +49,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
       this.route.params.subscribe(
         params => {
           this.activeCurrencyConversionTab = params['conversionCurrency'];
-          this.currentPage = params['page'];
+          this.currentPage = params['page'] - 1;
         }
       );
   }
@@ -63,12 +63,12 @@ export class CoinsComponent implements OnInit, OnDestroy {
     if (this.activeCurrencyConversionTab === ticker) {
       return;
     }
-    this.currentPage = 1;
+    this.currentPage = 0;
     this.activeCurrencyConversionTab = ticker;
     this.loading = true;
     this.subscriptions.map( subscription => subscription.unsubscribe());
     this.coinsService.stopStream();
-    this.router.navigate([`/coins/${ticker}/${this.currentPage}`]);
+    this.router.navigate([`/coins/${ticker}/${this.currentPage + 1}`]);
   }
 
   /**
@@ -80,7 +80,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
     // move these two lines to a helper method since they are written in 3 different places by now.
     this.subscriptions.map( subscription => subscription.unsubscribe());
     this.coinsService.stopStream();
-    this.router.navigate([`/coins/${this.activeCurrencyConversionTab}/${this.currentPage}`]);
+    this.router.navigate([`/coins/${this.activeCurrencyConversionTab}/${this.currentPage + 1}`]);
   }
 
   /**
@@ -91,7 +91,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
     this.currentPage--;
     this.subscriptions.map( subscription => subscription.unsubscribe());
     this.coinsService.stopStream();
-    this.router.navigate([`/coins/${this.activeCurrencyConversionTab}/${this.currentPage}`]);
+    this.router.navigate([`/coins/${this.activeCurrencyConversionTab}/${this.currentPage + 1}`]);
   }
 
   ngOnDestroy() {

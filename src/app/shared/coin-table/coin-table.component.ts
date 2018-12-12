@@ -8,4 +8,5 @@ import { CoinDataWithSocketData } from 'src/app/shared/cryptocompare/interfaces'
 })
 export class CoinTableComponent {
     @Input() coinData: CoinDataWithSocketData[];
+    @Input() page: number = 0;
 }
