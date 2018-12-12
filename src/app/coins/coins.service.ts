@@ -44,6 +44,7 @@ export class CoinsService {
      */
     getRealTimeCoinData(topCoinsByTotalVolume: CoinDataWithSocketData[]): Observable<CoinDataWithSocketData[]> {
         const cryptocompareSubscriptionsToAdd: string[] = this.generateCCSocketSubscriptions(topCoinsByTotalVolume);
+        this.cryptocompareSocketService.openSocket();
         this.addCCSocketSubscriptions(cryptocompareSubscriptionsToAdd);
         return this.subscribeToCCSocket()
             .pipe(
@@ -59,6 +60,9 @@ export class CoinsService {
             );
     }
 
+    closeSocket() {
+        this.cryptocompareSocketService.closeSocket();
+    }
     // Unsubscribes from the cryptocompare socket.
     stopStream() {
         this.isStreaming = false;
@@ -77,6 +81,7 @@ export class CoinsService {
      * @param socketVolumeData - RAW Cryptocompare volume socket emission.
      */
     private handleVolumeSocketData (socketVolumeData: string) {
+        console.log(socketVolumeData);
         const socketVolumeDataUnPacked = CCC.FULLVOLUME.unpack(socketVolumeData);
         const socketDataCurrencyFromTicker = socketVolumeDataUnPacked['SYMBOL'];
         const socketDataFullVolumeFrom = parseFloat(socketVolumeDataUnPacked['FULLVOLUME']);

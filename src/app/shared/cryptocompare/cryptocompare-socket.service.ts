@@ -7,10 +7,14 @@ export class CryptocompareSocketService {
     private socket: SocketIOClient.Socket;
     private socketSubscriptions: string [] = [];
 
-    constructor() {
+    constructor() {}
+
+    openSocket() {
         this.socket = io('https://streamer.cryptocompare.com/');
     }
-
+    closeSocket() {
+        this.socket.disconnect();
+    }
     /**
      * Add socket subscriptions of interest.
      * @param subscriptions - subscriptions to add

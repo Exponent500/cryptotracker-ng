@@ -89,7 +89,7 @@ export class CoinsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.map( subscription => subscription.unsubscribe());
-    this.coinsService.stopStream();
+    this.coinsService.closeSocket();
   }
 
   /**

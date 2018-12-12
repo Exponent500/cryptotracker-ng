@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
         this.getCoinDataSub = this.coinsService.getRealTimeCoinData(coinsDataSortedByTotalVolume)
         .subscribe(coinData => {
-          this.loading = false;
+          coinData[0].SocketData ? this.loading = false : this.loading = true;
           this.coinData = coinData;
           this.isStreaming = this.coinsService.isStreaming;
       });
@@ -45,7 +45,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.map( subscription => subscription.unsubscribe());
-    this.coinsService.stopStream();
+    this.coinsService.closeSocket();
   }
 
   /**

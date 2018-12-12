@@ -14,7 +14,6 @@ export class CoinsByTotalVolumeResolverForHomePage implements Resolve<TopCoinsBy
 
     constructor(private cryptoCompareDataService: CryptoCompareDataService) {}
      resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<TopCoinsByTotalVolumeResponse> {
-        console.log('in resolver');
         return this.cryptoCompareDataService.getTopCoinsByTotalVolume(this.conversionCurrency, this.numberOfCoins, this.page);
     }
 }
